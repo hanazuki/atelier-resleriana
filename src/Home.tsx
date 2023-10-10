@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 import * as ds from './dataset';
 
 const RecipeList: React.FC = () => {
@@ -15,7 +15,7 @@ const RecipeList: React.FC = () => {
     </ul>
     <ul>
       {recipes.map(r =>
-        <li><a href={`#/recipes/${r.name}`}>{r.name}</a></li>
+        <li><Link to={`/recipes/${r.name}`}>{r.name}</Link></li>
       )}
     </ul >
   </>

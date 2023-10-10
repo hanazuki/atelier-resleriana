@@ -4,15 +4,19 @@ import {
   createHashRouter,
   RouterProvider,
 } from 'react-router-dom';
+
 import Home from './Home'
+import Recipe from './Recipe'
 import './index.css'
 
 const router = createHashRouter([
   {
-    path: "/",
+    path: '/',
     element: <Home />,
-    children: [
-    ],
+  },
+  {
+    path: '/recipes/:recipeName',
+    element: <Recipe />
   },
 ]);
 
