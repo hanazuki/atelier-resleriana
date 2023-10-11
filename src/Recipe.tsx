@@ -121,7 +121,7 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     <Helmet>
       <title>{recipe.name}</title>
     </Helmet>
-    <h1>{isConsumable ? '🌰' : '🗡'}{recipe.name}</h1>
+    <h1>{isConsumable ? '🌰' : '🗡️'}{recipe.name}</h1>
     <h2>素材</h2>
     <ul>
       {recipe.ingredients.map(i =>
