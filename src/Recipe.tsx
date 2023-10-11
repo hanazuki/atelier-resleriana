@@ -78,7 +78,7 @@ const effectsOfConfigurations = (isConsumable: boolean, configs: Configuration[]
       }
     }
     return effects
-  }, new Set<string>()))
+  }, new Set<string>())).sort()
 
 
 interface RecipeProps {
