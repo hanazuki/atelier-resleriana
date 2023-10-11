@@ -81,7 +81,7 @@ const effectsOfConfigurations = (isConsumable: boolean, configs: Configuration[]
       }
     }
     return effects
-  }, new Set<string>())).sort()
+  }, new Set<string>())).sort((a, b) => a === b ? 0 : a.split('').reverse() < b.split('').reverse() ? -1 : 1)
 
 
 interface RecipeProps {
