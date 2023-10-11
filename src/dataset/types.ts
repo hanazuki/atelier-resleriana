@@ -3,31 +3,28 @@ export type Color = 'R' | 'B' | 'G' | 'Y' | 'P'
 export type Alchemist = {
   name: string;
   title: string;
-  color: [Color, Color];
+  colors: [Color, Color];
   effects: string[];
 }
 
+export const ItemType = {
+  CONSUMABLE: 'C',
+  EQUIPMENT: 'E',
+} as const
+
+export type ItemType = typeof ItemType[keyof typeof ItemType]
+
 export const ItemCategory = {
-  HEAL: 'HEAL',
-  ATTACK: 'ATTACK',
-  BUFF: 'BUFF',
-  DEBUFF: 'DEBUFF',
-  WEAPON: 'WEAPON',
-  ARMOUR: 'ARMOUR',
-  JEWELRY: 'JEWELRY',
-} as const;
+  HEAL: 'C|HEAL',
+  ATTACK: 'C|ATTACK',
+  BUFF: 'C|BUFF',
+  DEBUFF: 'C|DEBUFF',
+  WEAPON: 'E|WEAPON',
+  ARMOUR: 'E|ARMOUR',
+  JEWELRY: 'E|JEWELRY',
+} as const
 
-export type ItemCategory = typeof ItemCategory[keyof typeof ItemCategory];
-
-export const ItemCategories: ItemCategory[] = [
-  ItemCategory.HEAL,
-  ItemCategory.ATTACK,
-  ItemCategory.BUFF,
-  ItemCategory.DEBUFF,
-  ItemCategory.WEAPON,
-  ItemCategory.ARMOUR,
-  ItemCategory.JEWELRY,
-]
+export type ItemCategory = typeof ItemCategory[keyof typeof ItemCategory]
 
 export type Recipe = {
   category: ItemCategory;
@@ -41,6 +38,7 @@ export type Recipe = {
 
 export type Ingredient = {
   name: string;
-  color: Color,
+  color: Color;
+  effectType: ItemType;
   effects: string[];
 };
