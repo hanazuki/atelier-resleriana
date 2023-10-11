@@ -22,6 +22,10 @@ const recipes = [
     ['うに', 5],
     ['トーン', 5],
   ]),
+  r(c.WEAPON, '精霊の杖・火', ['B', 'P', 'R'], [
+    ['赤砂', 5],
+    ['スイートリーフ', 15],
+  ]),
 ];
 
 export default recipes;
