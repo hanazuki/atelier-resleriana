@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet'
+import * as css from './Recipe.css'
 import * as ds from './dataset'
 
 type Configuration = {
@@ -137,9 +138,24 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     <h2>編成</h2>
     <ul>
       {candidateConfigs.map(config => <li>
-        <span>{config.alchemist1.name}【{config.alchemist1.title}】</span>，
-        <span>{config.alchemist2.name}【{config.alchemist2.title}】</span>，
-        <span>{config.extraIngredient.name}</span>
+        <div className={css.card}>
+          <div className={css.cardTitle}>{config.alchemist1.name}【{config.alchemist1.title}】</div>
+          <div>
+            {isConsumable ? config.alchemist1.effects.slice(0, 2).join(', ') : config.alchemist1.effects[2]}
+          </div>
+        </div>
+        <div className={css.card}>
+          <div className={css.cardTitle}>{config.alchemist2.name}【{config.alchemist2.title}】</div>
+          <div>
+            {isConsumable ? config.alchemist2.effects.slice(0, 2).join(', ') : config.alchemist2.effects[2]}
+          </div>
+        </div>
+        <div className={css.card}>
+          <div className={css.cardTitle}>{config.extraIngredient.name}</div>
+          <div>
+            {config.extraIngredient.effects.join(', ')}
+          </div>
+        </div>
       </li>)}
     </ul>
   </>
