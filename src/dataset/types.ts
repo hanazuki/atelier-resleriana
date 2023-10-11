@@ -3,7 +3,8 @@ export type Color = 'R' | 'B' | 'G' | 'Y' | 'P'
 export type Alchemist = {
   name: string;
   title: string;
-  colors: [Color, Color];
+  color1: Color;
+  color2: Color;
   effects: string[];
 }
 
@@ -29,11 +30,11 @@ export type ItemCategory = typeof ItemCategory[keyof typeof ItemCategory]
 export type Recipe = {
   category: ItemCategory;
   name: string;
-  colors: Color[],
+  colors: Color[];
   ingredients: {
     name: string;
     count: number;
-  }[],
+  }[];
 }
 
 export type Ingredient = {

@@ -12,14 +12,14 @@ const search = (recipe: ds.Recipe, desiredEffects: (string | null)[]): Configura
   const configs: Configuration[] = []
 
   for (const alchemist1 of ds.alchemists) {
-    if (!recipe.colors.includes(alchemist1.colors[0])) continue
+    if (!recipe.colors.includes(alchemist1.color1)) continue
 
     for (const alchemist2 of ds.alchemists) {
-      if (alchemist1.colors[1] !== alchemist2.colors[0]) continue
+      if (alchemist1.color2 !== alchemist2.color1) continue
       if (alchemist1.name === alchemist2.name) continue
 
       for (const extraIngredient of ds.ingredients) {
-        if (alchemist2.colors[1] !== extraIngredient.color) continue
+        if (alchemist2.color2 !== extraIngredient.color) continue
         if (!recipe.category.startsWith(extraIngredient.effectType)) continue
 
         const possibleEffects = [
