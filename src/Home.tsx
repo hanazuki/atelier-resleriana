@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as ds from './dataset';
+import * as css from './Home.css'
+
+const recipeCategories: [ds.ItemCategory, string][] = [
+  [ds.ItemCategory.HEAL, '回復'],
+  [ds.ItemCategory.ATTACK, '攻撃'],
+  [ds.ItemCategory.BUFF, '強化'],
+  [ds.ItemCategory.DEBUFF, '弱体'],
+  [ds.ItemCategory.WEAPON, '武器'],
+  [ds.ItemCategory.ARMOUR, '防具'],
+  [ds.ItemCategory.JEWELRY, '装飾品'],
+]
 
 const RecipeList: React.FC = () => {
-  const [category, setCategory] = useState<ds.ItemCategory>(ds.ItemCategories[0])
+  const [category, setCategory] = useState<ds.ItemCategory>(ds.ItemCategory.HEAL)
 
   const recipes = ds.recipes.filter(r => r.category === category)
 
   return <>
-    <ul>
-      {ds.ItemCategories.map(c =>
-        <li><a onClick={() => setCategory(c)}>{c}</a></li>
+    <ul className={css.nav}>
+      {recipeCategories.map(([c, d]) =>
+        <li className={css.navItem}><a onClick={() => setCategory(c)}>{d}</a></li>
       )}
     </ul>
     <ul>
