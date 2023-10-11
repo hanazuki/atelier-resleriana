@@ -52,8 +52,11 @@ const EffectChooser: React.FC<EffectChooserProps> = ({ effects, possibleEffects,
       const selected = selectedEffects.includes(effect)
       const possible = possibleEffects.includes(effect)
 
-      return <li key={effect} onClick={() => selected ? deselect(effect) : select(effect)}>
-        {selected ? '☑' : '☐'} {possible ? effect : <s>{effect}</s>}
+      return <li key={effect}>
+        <label>
+          <input type='checkbox' checked={selected} onChange={(e) => e.target.checked ? select(effect) : deselect(effect)} />
+          {possible ? effect : <s>{effect}</s>}
+        </label>
       </li>
     })}
   </ul>
