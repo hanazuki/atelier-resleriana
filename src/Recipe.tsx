@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet'
 import * as ds from './dataset'
 
 type Configuration = {
@@ -116,6 +117,9 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
   console.log(candidateConfigs)
 
   return <>
+    <Helmet>
+      <title>{recipe.name}</title>
+    </Helmet>
     <h1>{isConsumable ? '🌰' : '🗡'}{recipe.name}</h1>
     <h2>素材</h2>
     <ul>

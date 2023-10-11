@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as ds from './dataset';
 import * as css from './Home.css'
+import { Helmet } from 'react-helmet';
 
 const recipeCategories: [ds.ItemCategory, string][] = [
   [ds.ItemCategory.HEAL, '回復'],
@@ -19,6 +20,9 @@ const RecipeList: React.FC = () => {
   const recipes = ds.recipes.filter(r => r.category === category)
 
   return <>
+    <Helmet>
+      <title>どれをつくろう？</title>
+    </Helmet>
     <ul className={css.nav}>
       {recipeCategories.map(([c, d]) =>
         <li className={css.navItem}><a onClick={() => setCategory(c)}>{d}</a></li>
