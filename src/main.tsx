@@ -8,16 +8,23 @@ import {
 import Home from './Home'
 import Recipe from './Recipe'
 import './index.css'
+import Root from './Root';
 
 const router = createHashRouter([
   {
     path: '/',
-    element: <Home />,
-  },
-  {
-    path: '/recipes/:recipeName',
-    element: <Recipe />
-  },
+    element: <Root />,
+    children: [
+      {
+        path: '',
+        element: <Home />
+      },
+      {
+        path: 'recipes/:recipeName',
+        element: <Recipe />
+      },
+    ],
+  }
 ]);
 
 
