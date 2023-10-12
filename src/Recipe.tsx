@@ -64,6 +64,17 @@ const EffectChooser: React.FC<EffectChooserProps> = ({ effects, possibleEffects,
   </ul>
 }
 
+const icon = (category: ds.ItemCategory) => {
+  switch (category) {
+    case ds.ItemCategory.HEAL: return '💊'
+    case ds.ItemCategory.ATTACK: return '💣'
+    case ds.ItemCategory.BUFF: return '🔺'
+    case ds.ItemCategory.DEBUFF: return '🔻'
+    case ds.ItemCategory.WEAPON: return '🗡'
+    case ds.ItemCategory.ARMOUR: return '🛡'
+    case ds.ItemCategory.JEWELRY: return '💍'
+  }
+}
 
 const effectsOfConfigurations = (isConsumable: boolean, configs: Configuration[]): string[] =>
   Array.from(configs.reduce((effects, method) => {
@@ -119,7 +130,7 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     <Helmet>
       <title>{recipe.name}</title>
     </Helmet>
-    <h1>{isConsumable ? '🌰' : '🗡️'}{recipe.name}</h1>
+    <h1>{icon(recipe.category)}{recipe.name}</h1>
     <h2>素材</h2>
     <ul>
       {recipe.ingredients.map(i =>
