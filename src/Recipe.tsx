@@ -137,7 +137,7 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
       deselect={deselectDesiredEffect} />
     <h2>編成</h2>
     <ul>
-      {candidateConfigs.map(config => <li>
+      {candidateConfigs.map(config => <li key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
         <div className={css.card}>
           <div className={css.cardTitle}>{config.alchemist1.name}【{config.alchemist1.title}】</div>
           <div>

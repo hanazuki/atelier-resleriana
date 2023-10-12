@@ -25,12 +25,12 @@ const RecipeList: React.FC = () => {
     </Helmet>
     <ul className={css.nav}>
       {recipeCategories.map(([c, d]) =>
-        <li className={css.navItem}><a onClick={() => setCategory(c)}>{d}</a></li>
+        <li className={css.navItem} key={c}><a onClick={() => setCategory(c)}>{d}</a></li>
       )}
     </ul>
     <ul>
       {recipes.map(r =>
-        <li><Link to={`/recipes/${r.name}`}>{r.name}</Link></li>
+        <li key={r.name}><Link to={`/recipes/${r.name}`}>{r.name}</Link></li>
       )}
     </ul >
   </>
