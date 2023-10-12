@@ -115,8 +115,6 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     return [configs, effects]
   }, [recipe, desiredEffects, isConsumable])
 
-  console.log(candidateConfigs)
-
   return <>
     <Helmet>
       <title>{recipe.name}</title>
@@ -135,7 +133,7 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
       selectedEffects={desiredEffects}
       select={selectDesiredEffect}
       deselect={deselectDesiredEffect} />
-    <h2>編成</h2>
+    <h2>編成 ({candidateConfigs.length})</h2>
     <ul>
       {candidateConfigs.map(config => <li key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
         <div className={css.card}>
