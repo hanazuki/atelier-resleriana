@@ -15,7 +15,7 @@ const ingredients: Ingredient[] = [
   i('三つ子トーン', 'R', t.CONSUMABLE, ['鳥特攻', '鳥特防']),
   i('コゲクサ', 'R', t.CONSUMABLE, ['火の呪詛', '守護の祝福']),
   i('貯ミツアリ', 'R', t.CONSUMABLE, ['雷の祝福', '雷の盾']),
-  i('きれない水', 'R', t.CONSUMABLE, ['大きな回復量', '魔力の呪詛']),
+  i('きれいな水', 'R', t.CONSUMABLE, ['大きな回復量', '魔力の呪詛']),
   i('レピアフィッシュ', 'R', t.CONSUMABLE, ['剛力の祝福', '魔力の祝福']),
   i('激憤の叫び', 'R', t.CONSUMABLE, ['精霊特攻', '使い切り回復強化']),
   i('砂晶石', 'R', t.CONSUMABLE, ['追い打ち強化', '単体回復ボーナス']),
