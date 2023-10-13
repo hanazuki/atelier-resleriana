@@ -1,8 +1,11 @@
 export type Color = 'R' | 'B' | 'G' | 'Y' | 'P'
 
+export type AlchemistRarity = 1 | 2 | 3
+
 export type Alchemist = {
   name: string;
   title: string;
+  rarity: AlchemistRarity
   color1: Color;
   color2: Color;
   effects: string[];
