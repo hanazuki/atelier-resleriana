@@ -1,17 +1,22 @@
 import React from 'react'
 import { Link, Outlet } from 'react-router-dom'
+import { Menu, Container } from 'semantic-ui-react'
 
-const Menu: React.FC = () => {
-  return <nav>
-    <div><Link to="/">🏠</Link></div>
-    <div><Link to="/settings">⚙️</Link></div>
-  </nav>
+const Navbar: React.FC = () => {
+  return <Menu fixed='top' inverted>
+    <Container style={{ fontSize: '1.2em' }}>
+      <Menu.Item as={Link} to='/' title='ホーム'>🏠</Menu.Item>
+      <Menu.Item as={Link} to='/settings' title='設定'>⚙</Menu.Item>
+    </Container>
+  </Menu>
 }
 
 const Root: React.FC = () => {
   return <>
-    <Menu />
-    <Outlet />
+    <Navbar />
+    <Container style={{ marginTop: '5em', scrollMarginTop: '5em' }}>
+      <Outlet />
+    </Container>
   </>
 }
 

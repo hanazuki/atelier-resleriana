@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Header, List, Tab } from 'semantic-ui-react'
 import * as ds from './dataset';
-import * as css from './Home.css'
 import { Helmet } from 'react-helmet';
 
 const recipeCategories: [ds.ItemCategory, string][] = [
@@ -15,24 +15,30 @@ const recipeCategories: [ds.ItemCategory, string][] = [
 ]
 
 const RecipeList: React.FC = () => {
-  const [category, setCategory] = useState<ds.ItemCategory>(ds.ItemCategory.HEAL)
-
-  const recipes = ds.recipes.filter(r => r.category === category)
-
   return <>
     <Helmet>
       <title>どれをつくろう？</title>
     </Helmet>
-    <ul className={css.nav}>
-      {recipeCategories.map(([c, d]) =>
-        <li className={css.navItem} key={c}><a onClick={() => setCategory(c)}>{d}</a></li>
-      )}
-    </ul>
-    <ul>
-      {recipes.map(r =>
-        <li key={r.name}><Link to={`/recipes/${r.name}`}>{r.name}</Link></li>
-      )}
-    </ul >
+    <Header as='h2'>レシピ</Header>
+    <Tab menu={{ fluid: true, vertical: true, tabular: true }} panes={
+      recipeCategories.map(([c, d]) => {
+        return {
+          menuItem: { key: c, content: d },
+          render: () => {
+            const recipes = ds.recipes.filter(r => r.category === c)
+            return <Tab.Pane>
+              <List as='ul'>
+                {recipes.map(r =>
+                  <List.Item key={r.name} as='li'>
+                    <Link to={`/recipes/${r.name}`}>{r.name}</Link>
+                  </List.Item>
+                )}
+              </List>
+            </Tab.Pane>
+          }
+        }
+      })
+    } />
   </>
 }
 

@@ -5,7 +5,7 @@ import Root from './Root';
 import Home from './Home'
 import Settings from './Settings'
 import Recipe from './Recipe'
-import './index.css'
+import 'semantic-ui-css/semantic.min.css';
 
 const App: React.FC = () => {
   const router = createHashRouter([
