@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet'
-import { Card, Checkbox, Divider, Header, Icon, List, Message, Segment } from 'semantic-ui-react'
+import { Card, Checkbox, Divider, Grid, Header, Icon, List, Message, Segment } from 'semantic-ui-react'
 import * as ds from './dataset'
 
 type Configuration = {
@@ -168,33 +168,40 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
         )}
       </List>
     </Segment>
-    <Header as='h3' attached='top'>特性</Header>
-    <Segment attached>
-      <EffectChooser
-        effects={allEffects}
-        possibleEffects={candidateEffects}
-        selectedEffects={desiredEffects}
-        select={selectDesiredEffect}
-        deselect={deselectDesiredEffect} />
-    </Segment>
-    <Header as='h3' attached='top'>編成 ({candidateConfigs.length})</Header>
-    <Segment attached>
-      {candidateConfigs.slice(0, maxCandidatesToShow).map((config, i) => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
-        {i > 0 ? <Divider /> : null}
-        <Card.Group centered itemsPerRow={3}>
-          <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable} />
-          <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable} />
-          <IngredientCard ingredient={config.extraIngredient} />
-        </Card.Group>
-      </div >)
-      }
-    </Segment>
-    {candidateConfigs.length > maxCandidatesToShow
-      ? <Message warning attached='bottom'>
-        <Icon name='warning' />
-        他{candidateConfigs.length - maxCandidatesToShow}パターン省略
-      </Message>
-      : null}
+
+    <Grid style={{ marginTop: '1rem' }} stackable>
+      <Grid.Column width={4}>
+        <Header as='h3' attached='top'>特性</Header>
+        <Segment attached>
+          <EffectChooser
+            effects={allEffects}
+            possibleEffects={candidateEffects}
+            selectedEffects={desiredEffects}
+            select={selectDesiredEffect}
+            deselect={deselectDesiredEffect} />
+        </Segment>
+      </Grid.Column>
+      <Grid.Column width={12} stretched>
+        <Header as='h3' attached='top'>編成 ({candidateConfigs.length})</Header>
+        <Segment attached>
+          {candidateConfigs.slice(0, maxCandidatesToShow).map((config, i) => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
+            {i > 0 ? <Divider /> : null}
+            <Card.Group centered itemsPerRow={3}>
+              <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable} />
+              <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable} />
+              <IngredientCard ingredient={config.extraIngredient} />
+            </Card.Group>
+          </div >)
+          }
+        </Segment>
+        {candidateConfigs.length > maxCandidatesToShow
+          ? <Message warning attached='bottom'>
+            <Icon name='warning' />
+            他{candidateConfigs.length - maxCandidatesToShow}パターン省略
+          </Message>
+          : null}
+      </Grid.Column>
+    </Grid>
   </>
 }
 
