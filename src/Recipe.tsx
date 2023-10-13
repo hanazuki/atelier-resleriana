@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet'
-import { Card, Checkbox, Divider, Header, List, Segment } from 'semantic-ui-react'
+import { Card, Checkbox, Divider, Header, Icon, List, Message, Segment } from 'semantic-ui-react'
 import * as ds from './dataset'
 
 type Configuration = {
@@ -124,6 +124,8 @@ const IngredientCard: React.FC<{ ingredient: ds.Ingredient }> = ({ ingredient })
   </Card>
 }
 
+const maxCandidatesToShow = 100
+
 interface RecipeProps {
   recipe: ds.Recipe
 }
@@ -177,16 +179,22 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     </Segment>
     <Header as='h3' attached='top'>編成 ({candidateConfigs.length})</Header>
     <Segment attached>
-      {candidateConfigs.map(config => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
+      {candidateConfigs.slice(0, maxCandidatesToShow).map((config, i) => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
+        {i > 0 ? <Divider /> : null}
         <Card.Group centered itemsPerRow={3}>
           <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable} />
           <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable} />
           <IngredientCard ingredient={config.extraIngredient} />
         </Card.Group>
-        <Divider />
       </div >)
       }
     </Segment>
+    {candidateConfigs.length > maxCandidatesToShow
+      ? <Message warning attached='bottom'>
+        <Icon name='warning' />
+        他{candidateConfigs.length - maxCandidatesToShow}パターン省略
+      </Message>
+      : null}
   </>
 }
 
