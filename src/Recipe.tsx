@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet'
-import { Card, Divider, Header } from 'semantic-ui-react'
+import { Card, Checkbox, Divider, Header, List, Segment } from 'semantic-ui-react'
 import * as ds from './dataset'
 
 type Configuration = {
@@ -49,19 +49,16 @@ interface EffectChooserProps {
 }
 
 const EffectChooser: React.FC<EffectChooserProps> = ({ effects, possibleEffects, selectedEffects, select, deselect }) => {
-  return <ul>
+  return <List>
     {effects.map(effect => {
       const selected = selectedEffects.includes(effect)
       const possible = possibleEffects.includes(effect)
 
-      return <li key={effect}>
-        <label>
-          <input type='checkbox' checked={selected} onChange={(e) => e.target.checked ? select(effect) : deselect(effect)} />
-          {possible ? effect : <s>{effect}</s>}
-        </label>
-      </li>
+      return <List.Item key={effect}>
+        <Checkbox checked={selected} onChange={(_e, data) => data.checked ? select(effect) : deselect(effect)} label={<label>{possible ? effect : <s>{effect}</s>}</label>} />
+      </List.Item>
     })}
-  </ul>
+  </List>
 }
 
 const icon = (category: ds.ItemCategory) => {
@@ -161,29 +158,35 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
       <title>{recipe.name}</title>
     </Helmet>
     <Header as='h2'>{icon(recipe.category)}{recipe.name}</Header>
-    <Header as='h2'>素材</Header>
-    <ul>
-      {recipe.ingredients.map(i =>
-        <li key={i.name}><Link to={`/ingredients/${i.name}`}>{i.name}</Link> ({i.count})</li>
-      )}
-    </ul>
-    <h2>特性</h2>
-    <EffectChooser
-      effects={allEffects}
-      possibleEffects={candidateEffects}
-      selectedEffects={desiredEffects}
-      select={selectDesiredEffect}
-      deselect={deselectDesiredEffect} />
-    <h2>編成 ({candidateConfigs.length})</h2>
-    {candidateConfigs.map(config => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
-      <Card.Group centered itemsPerRow={3}>
-        <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable} />
-        <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable} />
-        <IngredientCard ingredient={config.extraIngredient} />
-      </Card.Group>
-      <Divider />
-    </div >)
-    }
+    <Header as='h3' attached='top'>素材</Header>
+    <Segment attached>
+      <List>
+        {recipe.ingredients.map(i =>
+          <List.Item key={i.name}><Link to={`/ingredients/${i.name}`}>{i.name}</Link> ({i.count})</List.Item>
+        )}
+      </List>
+    </Segment>
+    <Header as='h3' attached='top'>特性</Header>
+    <Segment attached>
+      <EffectChooser
+        effects={allEffects}
+        possibleEffects={candidateEffects}
+        selectedEffects={desiredEffects}
+        select={selectDesiredEffect}
+        deselect={deselectDesiredEffect} />
+    </Segment>
+    <Header as='h3' attached='top'>編成 ({candidateConfigs.length})</Header>
+    <Segment attached>
+      {candidateConfigs.map(config => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
+        <Card.Group centered itemsPerRow={3}>
+          <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable} />
+          <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable} />
+          <IngredientCard ingredient={config.extraIngredient} />
+        </Card.Group>
+        <Divider />
+      </div >)
+      }
+    </Segment>
   </>
 }
 
