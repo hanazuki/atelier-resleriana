@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
 const Root: React.FC = () => {
   return <>
     <Navbar />
-    <Container style={{ marginTop: '5em', scrollMarginTop: '5em' }}>
+    <Container style={{ paddingBlock: '5em 1em', scrollPaddingBlockStart: '5em' }}>
       <Outlet />
     </Container>
   </>
