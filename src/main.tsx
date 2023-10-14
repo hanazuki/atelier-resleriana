@@ -10,7 +10,7 @@ import Recipe from './Recipe'
 import 'semantic-ui-css/semantic.min.css';
 
 const App: React.FC = () => {
-  const [globalSettings, setGlobalSettings] = useLocalStorage<GlobalSettings>('settings', {
+  const [globalSettings, setGlobalSettings] = useLocalStorage<GlobalSettings>('atelier_resleriana_settings', {
     alchemists: {},
   })
 
