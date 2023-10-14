@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet'
-import { Card, Checkbox, Divider, Grid, Header, Icon, List, Message, Segment } from 'semantic-ui-react'
+import { Card, Checkbox, Divider, Grid, Header, Icon, Input, List, Message, Segment } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
 import { GlobalSettings, AlchemistSettings, _alchemist } from './global';
@@ -64,16 +64,23 @@ interface EffectChooserProps {
 }
 
 const EffectChooser: React.FC<EffectChooserProps> = ({ effects, possibleEffects, selectedEffects, select, deselect }) => {
-  return <List>
-    {effects.map(effect => {
-      const selected = selectedEffects.includes(effect)
-      const possible = possibleEffects.includes(effect)
+  const [filter, setFilter] = useState<string>('');
 
-      return <List.Item key={effect}>
-        <Checkbox checked={selected} onChange={(_e, data) => data.checked ? select(effect) : deselect(effect)} label={<label>{possible ? effect : <s>{effect}</s>}</label>} />
-      </List.Item>
-    })}
-  </List>
+  const filteredEffects = effects.filter(eff => eff.includes(filter))
+
+  return <>
+    <Input icon='search' placeholder='フィルタ' value={filter} onChange={(_e, data) => setFilter(data.value)} />
+    <List>
+      {filteredEffects.map(effect => {
+        const selected = selectedEffects.includes(effect)
+        const possible = possibleEffects.includes(effect)
+
+        return <List.Item key={effect}>
+          <Checkbox checked={selected} onChange={(_e, data) => data.checked ? select(effect) : deselect(effect)} label={<label>{possible ? effect : <s>{effect}</s>}</label>} />
+        </List.Item>
+      })}
+    </List>
+  </>
 }
 
 const icon = (category: ds.ItemCategory) => {
