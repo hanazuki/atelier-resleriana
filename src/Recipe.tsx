@@ -2,21 +2,30 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet'
 import { Card, Checkbox, Divider, Grid, Header, Icon, List, Message, Segment } from 'semantic-ui-react'
+import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
+import { GlobalSettings, AlchemistSettings, _alchemist } from './global';
 
 type Configuration = {
+  recipe: ds.Recipe
   alchemist1: ds.Alchemist
   alchemist2: ds.Alchemist
   extraIngredient: ds.Ingredient
 }
 
-const search = (recipe: ds.Recipe, desiredEffects: (string | null)[]): Configuration[] => {
+const search = (
+  recipe: ds.Recipe,
+  desiredEffects: (string | null)[],
+  alchemistSettings: (alchemist: ds.Alchemist) => AlchemistSettings,
+): Configuration[] => {
   const configs: Configuration[] = []
 
   for (const alchemist1 of ds.alchemists) {
+    if (!alchemistSettings(alchemist1).unlocked) continue;
     if (!recipe.colors.includes(alchemist1.color1)) continue
 
     for (const alchemist2 of ds.alchemists) {
+      if (!alchemistSettings(alchemist2).unlocked) continue;
       if (alchemist1.color2 !== alchemist2.color1) continue
       if (alchemist1.name === alchemist2.name) continue
 
@@ -31,13 +40,19 @@ const search = (recipe: ds.Recipe, desiredEffects: (string | null)[]): Configura
         ]
 
         if (desiredEffects.every(e => e === null || possibleEffects.includes(e))) {
-          configs.push({ alchemist1, alchemist2, extraIngredient })
+          configs.push({ recipe, alchemist1, alchemist2, extraIngredient })
         }
       }
     }
   }
 
-  return configs
+  return configs.sort(
+    (a, b) => {
+      const ria = alchemistSettings(a.alchemist1).rarityIncrease + alchemistSettings(a.alchemist2).rarityIncrease
+      const rib = alchemistSettings(b.alchemist1).rarityIncrease + alchemistSettings(b.alchemist2).rarityIncrease
+      return rib - ria
+    }
+  )
 }
 
 interface EffectChooserProps {
@@ -94,30 +109,38 @@ const effectsOfConfigurations = (isConsumable: boolean, configs: Configuration[]
   }, new Set<string>())).sort((a, b) => a === b ? 0 : a.split('').reverse() < b.split('').reverse() ? -1 : 1)
 
 
-const AlchemistCard: React.FC<{ alchemist: ds.Alchemist, isConsumable: boolean }> = ({ alchemist, isConsumable }) => {
+const AlchemistCard: React.FC<{
+  alchemist: ds.Alchemist,
+  isConsumable: boolean,
+  rarityIncrease: number,
+  desiredEffects: string[],
+}> = ({ alchemist, isConsumable, rarityIncrease, desiredEffects }) => {
   return <Card>
     <Card.Content>
       <Card.Header>{alchemist.name}</Card.Header>
       <Card.Meta>{alchemist.title}</Card.Meta>
       <Card.Description>
         {(isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]).map(eff =>
-          <div key={eff}>{eff}</div>
+          <div key={eff}>{desiredEffects.includes(eff) ? <strong>{eff}</strong> : eff}</div>
         )}
       </Card.Description>
     </Card.Content>
     <Card.Content extra textAlign='right'>
-      +0%
+      +{rarityIncrease}%
     </Card.Content>
   </Card>
 }
 
-const IngredientCard: React.FC<{ ingredient: ds.Ingredient }> = ({ ingredient }) => {
+const IngredientCard: React.FC<{
+  ingredient: ds.Ingredient,
+  desiredEffects: string[],
+}> = ({ ingredient, desiredEffects }) => {
   return <Card>
     <Card.Content>
       <Card.Header>{ingredient.name}</Card.Header>
       <Card.Description>
         {ingredient.effects.map(eff =>
-          <div key={eff}>{eff}</div>
+          <div key={eff}>{desiredEffects.includes(eff) ? <strong>{eff}</strong> : eff}</div>
         )}
       </Card.Description>
     </Card.Content>
@@ -128,9 +151,10 @@ const maxCandidatesToShow = 100
 
 interface RecipeProps {
   recipe: ds.Recipe
+  settings: GlobalSettings
 }
 
-const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
+const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
   const isConsumable = recipe.category.startsWith(ds.ItemType.CONSUMABLE)
 
   const [desiredEffects, setDesiredEffects] = useState<string[]>([])
@@ -143,14 +167,17 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     setDesiredEffects(desiredEffects.filter(eff => eff !== effect))
   }, [desiredEffects])
 
+  const alchemistSettings = (alchemist: ds.Alchemist) =>
+    Optic.get(_alchemist(alchemist.name, alchemist.title))(settings)
+
   const [, allEffects] = useMemo(() => {
-    const configs = search(recipe, [])
+    const configs = search(recipe, [], alchemistSettings)
     const effects = effectsOfConfigurations(isConsumable, configs)
     return [configs, effects]
   }, [recipe, isConsumable])
 
   const [candidateConfigs, candidateEffects] = useMemo(() => {
-    const configs = search(recipe, desiredEffects)
+    const configs = search(recipe, desiredEffects, alchemistSettings)
     const effects = effectsOfConfigurations(isConsumable, configs)
     return [configs, effects]
   }, [recipe, desiredEffects, isConsumable])
@@ -181,18 +208,25 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
             deselect={deselectDesiredEffect} />
         </Segment>
       </Grid.Column>
-      <Grid.Column width={12} stretched>
+      <Grid.Column width={12}>
         <Header as='h3' attached='top'>編成 ({candidateConfigs.length})</Header>
         <Segment attached>
-          {candidateConfigs.slice(0, maxCandidatesToShow).map((config, i) => <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
-            {i > 0 ? <Divider /> : null}
-            <Card.Group centered itemsPerRow={3}>
-              <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable} />
-              <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable} />
-              <IngredientCard ingredient={config.extraIngredient} />
-            </Card.Group>
-          </div >)
-          }
+          {candidateConfigs.map((config, i) => {
+            const as1 = alchemistSettings(config.alchemist1)
+            const as2 = alchemistSettings(config.alchemist2)
+
+            return <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
+              {i > 0 ? <Divider /> : null}
+              <Card.Group centered itemsPerRow={3}>
+                <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable}
+                  rarityIncrease={as1.rarityIncrease} desiredEffects={desiredEffects} />
+                <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable}
+                  rarityIncrease={as2.rarityIncrease} desiredEffects={desiredEffects} />
+                <IngredientCard ingredient={config.extraIngredient}
+                  desiredEffects={desiredEffects} />
+              </Card.Group>
+            </div >
+          }).filter(e => e !== null).slice(0, maxCandidatesToShow)}
         </Segment>
         {candidateConfigs.length > maxCandidatesToShow
           ? <Message warning attached='bottom'>
@@ -205,13 +239,13 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
   </>
 }
 
-const RecipeWrapper: React.FC = () => {
+const RecipeWrapper: React.FC<Omit<RecipeProps, 'recipe'>> = (props) => {
   const { recipeName } = useParams()
   const recipe = ds.recipes.find(r => r.name === recipeName)
   if (!recipe) {
     return null
   }
-  return <Recipe recipe={recipe} />
+  return <Recipe recipe={recipe} {...props} />
 }
 
 export default RecipeWrapper

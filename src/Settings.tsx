@@ -2,8 +2,7 @@ import React from 'react'
 import { Button, Card, Checkbox, Dropdown, Tab } from 'semantic-ui-react'
 import { Helmet } from 'react-helmet'
 import * as Optic from '@fp-ts/optic'
-import { keyOrDefault } from './optics'
-import { AlchemistSettings, GlobalSettings } from './global'
+import { AlchemistSettings, GlobalSettings, _alchemist } from './global'
 import * as ds from './dataset'
 
 interface SettingsProps {
@@ -23,23 +22,18 @@ const Settings: React.FC<SettingsProps> = ({ settings: globalSettings, setSettin
     }))
 
     return ds.alchemists.map(a => {
-      const key = `${a.name}/${a.title}` as const
-      const _alchemist = Optic.id<GlobalSettings>().at('alchemists').compose(keyOrDefault(key, () => ({
-        unlocked: true,
-        rarityIncrease: 0,
-      })))
-
-      const s: AlchemistSettings = Optic.get(_alchemist)(globalSettings)
+      const _a = _alchemist(a.name, a.title)
+      const s: AlchemistSettings = Optic.get(_a)(globalSettings)
 
       const setUnlocked = (unlocked: boolean): void => {
-        setGlobalSettings(Optic.replace(_alchemist.at('unlocked'))(unlocked)(globalSettings))
+        setGlobalSettings(Optic.replace(_a.at('unlocked'))(unlocked)(globalSettings))
       }
 
       const setRarityIncrease = (chance: number): void => {
-        setGlobalSettings(Optic.replace(_alchemist.at('rarityIncrease'))(chance)(globalSettings))
+        setGlobalSettings(Optic.replace(_a.at('rarityIncrease'))(chance)(globalSettings))
       }
 
-      return <Card key={key}>
+      return <Card key={`${a.name}/${a.title}`}>
         <Card.Content>
           <Card.Header style={{ display: 'flex' }}><div style={{ flex: 1 }}>{a.name}</div><div style={{ letterSpacing: '-.5em' }} title={`星${a.rarity}`}>{'⭐'.repeat(a.rarity)}</div></Card.Header>
           <Card.Meta>{a.title}</Card.Meta>

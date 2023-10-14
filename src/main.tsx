@@ -29,7 +29,7 @@ const App: React.FC = () => {
         },
         {
           path: 'recipes/:recipeName',
-          element: <Recipe />
+          element: <Recipe settings={globalSettings} />
         },
       ],
     }
