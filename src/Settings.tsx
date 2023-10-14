@@ -67,6 +67,7 @@ const Settings: React.FC<SettingsProps> = ({ settings: globalSettings, setSettin
         <List>
           <List.Item>Repo: <a href="https://github.com/hanazuki/atelier-resleriana">https://github.com/hanazuki/atelier-resleriana</a></List.Item>
           <List.Item>Commit: {import.meta.env.GIT_COMMIT_SHA}</List.Item>
+          <List.Item>Legal notices: <a href="./vendor.LICENSE.txt">vendor.LICENSE.txt</a></List.Item>
         </List>
       </Tab.Pane>
     },
