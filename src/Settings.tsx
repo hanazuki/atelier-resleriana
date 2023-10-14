@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Card, Checkbox, Dropdown, Tab } from 'semantic-ui-react'
+import { Button, Card, Checkbox, Divider, Dropdown, List, Tab } from 'semantic-ui-react'
 import { Helmet } from 'react-helmet'
 import * as Optic from '@fp-ts/optic'
 import { AlchemistSettings, GlobalSettings, _alchemist } from './global'
@@ -63,6 +63,11 @@ const Settings: React.FC<SettingsProps> = ({ settings: globalSettings, setSettin
       menuItem: { content: '設定管理' },
       render: () => <Tab.Pane>
         <Button negative onClick={() => setGlobalSettings({ alchemists: {} })}>💣 設定を初期化 💣</Button>
+        <Divider />
+        <List>
+          <List.Item>Repo: <a href="https://github.com/hanazuki/atelier-resleriana">https://github.com/hanazuki/atelier-resleriana</a></List.Item>
+          <List.Item>Commit: {import.meta.env.GIT_COMMIT_SHA}</List.Item>
+        </List>
       </Tab.Pane>
     },
   ]
