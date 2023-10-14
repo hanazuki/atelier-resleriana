@@ -16,6 +16,18 @@ export default defineConfig({
       plugins: [
         license({
           thirdParty: {
+            includePrivate: false,
+            allow: {
+              test: (dependency) => {
+                if (!dependency.license) return false;
+                return [
+                  'MIT',
+                  'BSD-3-Clause'
+                ].includes(dependency.license);
+              },
+              failOnUnlicensed: true,
+              failOnViolation: true,
+            },
             output: path.resolve(__dirname, './dist/assets/vendor.LICENSE.txt'),
           },
         }),
