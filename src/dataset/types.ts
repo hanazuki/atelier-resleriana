@@ -31,6 +31,7 @@ export const ItemCategory = {
 export type ItemCategory = typeof ItemCategory[keyof typeof ItemCategory]
 
 export type Recipe = {
+  series: string
   category: ItemCategory;
   name: string;
   colors: Color[];
