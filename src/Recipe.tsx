@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet'
 import { Card, Checkbox, Divider, Grid, Header, Icon, Input, List, Message, Segment } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
-import { GlobalSettings, AlchemistSettings, _alchemist } from './global';
+import { GlobalSettings, _alchemist } from './global';
 
 type Configuration = {
   recipe: ds.Recipe
@@ -13,19 +13,63 @@ type Configuration = {
   extraIngredient: ds.Ingredient
 }
 
+type Synthesis = {
+  config: Configuration
+  effects: {
+    alchemist1: { name: string; active: boolean }[]
+    alchemist2: { name: string; active: boolean }[]
+    extraIngredient: { name: string; active: boolean }[]
+  }
+  rarityIncrease: {
+    alchemist1: number
+    alchemist2: number
+  }
+}
+
+const _unlocked = (alchemist: ds.Alchemist) =>
+  _alchemist(alchemist.name, alchemist.title).at('unlocked')
+const _rarityIncrease = (alchemist: ds.Alchemist) =>
+  _alchemist(alchemist.name, alchemist.title).at('rarityIncrease')
+
+const synthesize = (config: Configuration, settings: GlobalSettings): Synthesis => {
+  const isConsumable = config.recipe.category.startsWith(ds.ItemType.CONSUMABLE)
+
+  const alchemistEffects = (alchemist: ds.Alchemist) =>
+    isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]
+  const ingredientEffects = (ingredient: ds.Ingredient) =>
+    isConsumable === (ingredient.effectType === ds.ItemType.CONSUMABLE) ? ingredient.effects : []
+
+  const effects = {
+    alchemist1: alchemistEffects(config.alchemist1).map(name => ({ name, active: true })),
+    alchemist2: alchemistEffects(config.alchemist2).map(name => ({ name, active: true })),
+    extraIngredient: ingredientEffects(config.extraIngredient).map(name => ({ name, active: true })),
+  }
+
+  const rarityIncrease = {
+    alchemist1: Optic.get(_rarityIncrease(config.alchemist1))(settings),
+    alchemist2: Optic.get(_rarityIncrease(config.alchemist2))(settings),
+  }
+
+  return {
+    config,
+    effects,
+    rarityIncrease,
+  }
+}
+
 const search = (
   recipe: ds.Recipe,
   desiredEffects: (string | null)[],
-  alchemistSettings: (alchemist: ds.Alchemist) => AlchemistSettings,
-): Configuration[] => {
-  const configs: Configuration[] = []
+  settings: GlobalSettings,
+): Synthesis[] => {
+  const syntheses: Synthesis[] = []
 
   for (const alchemist1 of ds.alchemists) {
-    if (!alchemistSettings(alchemist1).unlocked) continue;
+    if (!Optic.get(_unlocked(alchemist1))(settings)) continue;
     if (!recipe.colors.includes(alchemist1.color1)) continue
 
     for (const alchemist2 of ds.alchemists) {
-      if (!alchemistSettings(alchemist2).unlocked) continue;
+      if (!Optic.get(_unlocked(alchemist2))(settings)) continue;
       if (alchemist1.color2 !== alchemist2.color1) continue
       if (alchemist1.name === alchemist2.name) continue
 
@@ -33,23 +77,26 @@ const search = (
         if (alchemist2.color2 !== extraIngredient.color) continue
         if (!recipe.category.startsWith(extraIngredient.effectType)) continue
 
+        const config = { recipe, alchemist1, alchemist2, extraIngredient }
+        const synthesis = synthesize(config, settings)
+
         const possibleEffects = [
-          ...alchemist1.effects,
-          ...alchemist2.effects,
-          ...extraIngredient.effects,
+          ...synthesis.effects.alchemist1,
+          ...synthesis.effects.alchemist2,
+          ...synthesis.effects.extraIngredient,
         ]
 
-        if (desiredEffects.every(e => e === null || possibleEffects.includes(e))) {
-          configs.push({ recipe, alchemist1, alchemist2, extraIngredient })
+        if (desiredEffects.every(e => e === null || possibleEffects.some(({ name: pe }) => pe === e))) {
+          syntheses.push(synthesis)
         }
       }
     }
   }
 
-  return configs.sort(
+  return syntheses.sort(
     (a, b) => {
-      const ria = alchemistSettings(a.alchemist1).rarityIncrease + alchemistSettings(a.alchemist2).rarityIncrease
-      const rib = alchemistSettings(b.alchemist1).rarityIncrease + alchemistSettings(b.alchemist2).rarityIncrease
+      const ria = a.rarityIncrease.alchemist1 + a.rarityIncrease.alchemist2
+      const rib = b.rarityIncrease.alchemist1 + b.rarityIncrease.alchemist2
       return rib - ria
     }
   )
@@ -95,40 +142,35 @@ const icon = (category: ds.ItemCategory) => {
   }
 }
 
-const effectsOfConfigurations = (isConsumable: boolean, configs: Configuration[]): string[] =>
-  Array.from(configs.reduce((effects, method) => {
-    if (isConsumable) {
-      effects.add(method.alchemist1.effects[0])
-      effects.add(method.alchemist1.effects[1])
-      effects.add(method.alchemist2.effects[0])
-      effects.add(method.alchemist2.effects[1])
-      if (method.extraIngredient.effectType == ds.ItemType.CONSUMABLE) {
-        for (const eff of method.extraIngredient.effects) effects.add(eff)
-      }
-    } else {
-      effects.add(method.alchemist1.effects[2])
-      effects.add(method.alchemist2.effects[2])
-      if (method.extraIngredient.effectType == ds.ItemType.EQUIPMENT) {
-        for (const eff of method.extraIngredient.effects) effects.add(eff)
-      }
+const effectsOfSyntheses = (syntheses: Synthesis[]): string[] => {
+  const effects = new Set<string>()
+  for (const s of syntheses) {
+    for (const { name: eff } of [
+      ...s.effects.alchemist1,
+      ...s.effects.alchemist2,
+      ...s.effects.extraIngredient
+    ]) {
+      effects.add(eff)
     }
-    return effects
-  }, new Set<string>())).sort((a, b) => a === b ? 0 : a.split('').reverse() < b.split('').reverse() ? -1 : 1)
+  }
+
+  return Array.from(effects).sort((a, b) => a === b ? 0 : a.split('').reverse() < b.split('').reverse() ? -1 : 1)
+}
 
 
 const AlchemistCard: React.FC<{
   alchemist: ds.Alchemist,
-  isConsumable: boolean,
   rarityIncrease: number,
+  effects: { name: string; active: boolean }[],
   desiredEffects: string[],
-}> = ({ alchemist, isConsumable, rarityIncrease, desiredEffects }) => {
+}> = ({ alchemist, rarityIncrease, effects, desiredEffects }) => {
   return <Card>
     <Card.Content>
       <Card.Header>{alchemist.name}</Card.Header>
       <Card.Meta>{alchemist.title}</Card.Meta>
       <Card.Description>
-        {(isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]).map(eff =>
-          <div key={eff}>{desiredEffects.includes(eff) ? <strong>{eff}</strong> : eff}</div>
+        {effects.map(({ name }) =>
+          <div key={name}>{desiredEffects.includes(name) ? <strong>{name}</strong> : name}</div>
         )}
       </Card.Description>
     </Card.Content>
@@ -140,14 +182,15 @@ const AlchemistCard: React.FC<{
 
 const IngredientCard: React.FC<{
   ingredient: ds.Ingredient,
+  effects: { name: string; active: boolean }[],
   desiredEffects: string[],
-}> = ({ ingredient, desiredEffects }) => {
+}> = ({ ingredient, effects, desiredEffects }) => {
   return <Card>
     <Card.Content>
       <Card.Header>{ingredient.name}</Card.Header>
       <Card.Description>
-        {ingredient.effects.map(eff =>
-          <div key={eff}>{desiredEffects.includes(eff) ? <strong>{eff}</strong> : eff}</div>
+        {effects.map(({ name }) =>
+          <div key={name}>{desiredEffects.includes(name) ? <strong>{name}</strong> : name}</div>
         )}
       </Card.Description>
     </Card.Content>
@@ -174,21 +217,17 @@ const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
     setDesiredEffects(desiredEffects.filter(eff => eff !== effect))
   }, [desiredEffects])
 
-  const alchemistSettings = useCallback((alchemist: ds.Alchemist) =>
-    Optic.get(_alchemist(alchemist.name, alchemist.title))(settings),
-    [settings])
-
   const [, allEffects] = useMemo(() => {
-    const configs = search(recipe, [], alchemistSettings)
-    const effects = effectsOfConfigurations(isConsumable, configs)
-    return [configs, effects]
-  }, [recipe, isConsumable, alchemistSettings])
+    const syntheses = search(recipe, [], settings)
+    const effects = effectsOfSyntheses(syntheses)
+    return [syntheses, effects]
+  }, [recipe, settings])
 
-  const [candidateConfigs, candidateEffects] = useMemo(() => {
-    const configs = search(recipe, desiredEffects, alchemistSettings)
-    const effects = effectsOfConfigurations(isConsumable, configs)
-    return [configs, effects]
-  }, [recipe, desiredEffects, isConsumable, alchemistSettings])
+  const [candidateSyntheses, candidateEffects] = useMemo(() => {
+    const syntheses = search(recipe, desiredEffects, settings)
+    const effects = effectsOfSyntheses(syntheses)
+    return [syntheses, effects]
+  }, [recipe, desiredEffects, settings])
 
   return <>
     <Helmet>
@@ -217,29 +256,26 @@ const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
         </Segment>
       </Grid.Column>
       <Grid.Column width={12}>
-        <Header as='h3' attached='top'>編成 ({candidateConfigs.length})</Header>
+        <Header as='h3' attached='top'>編成 ({candidateSyntheses.length})</Header>
         <Segment attached>
-          {candidateConfigs.map((config, i) => {
-            const as1 = alchemistSettings(config.alchemist1)
-            const as2 = alchemistSettings(config.alchemist2)
-
-            return <div key={`${config.alchemist1.name}${config.alchemist1.title}${config.alchemist2.name}${config.alchemist2.name}${config.extraIngredient.name}`}>
+          {candidateSyntheses.map((synthesis, i) => {
+            return <div key={`${synthesis.config.alchemist1.name}${synthesis.config.alchemist1.title}${synthesis.config.alchemist2.name}${synthesis.config.alchemist2.name}${synthesis.config.extraIngredient.name}`}>
               {i > 0 ? <Divider /> : null}
               <Card.Group centered itemsPerRow={3}>
-                <AlchemistCard alchemist={config.alchemist1} isConsumable={isConsumable}
-                  rarityIncrease={as1.rarityIncrease} desiredEffects={desiredEffects} />
-                <AlchemistCard alchemist={config.alchemist2} isConsumable={isConsumable}
-                  rarityIncrease={as2.rarityIncrease} desiredEffects={desiredEffects} />
-                <IngredientCard ingredient={config.extraIngredient}
-                  desiredEffects={desiredEffects} />
+                <AlchemistCard alchemist={synthesis.config.alchemist1} effects={synthesis.effects.alchemist1}
+                  rarityIncrease={synthesis.rarityIncrease.alchemist1} desiredEffects={desiredEffects} />
+                <AlchemistCard alchemist={synthesis.config.alchemist2} effects={synthesis.effects.alchemist2}
+                  rarityIncrease={synthesis.rarityIncrease.alchemist2} desiredEffects={desiredEffects} />
+                <IngredientCard ingredient={synthesis.config.extraIngredient}
+                  effects={synthesis.effects.extraIngredient} desiredEffects={desiredEffects} />
               </Card.Group>
             </div >
           }).filter(e => e !== null).slice(0, maxCandidatesToShow)}
         </Segment>
-        {candidateConfigs.length > maxCandidatesToShow
+        {candidateSyntheses.length > maxCandidatesToShow
           ? <Message warning attached='bottom'>
             <Icon name='warning' />
-            他{candidateConfigs.length - maxCandidatesToShow}パターン省略
+            他{candidateSyntheses.length - maxCandidatesToShow}パターン省略
           </Message>
           : null}
       </Grid.Column>
