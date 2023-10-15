@@ -174,20 +174,21 @@ const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
     setDesiredEffects(desiredEffects.filter(eff => eff !== effect))
   }, [desiredEffects])
 
-  const alchemistSettings = (alchemist: ds.Alchemist) =>
-    Optic.get(_alchemist(alchemist.name, alchemist.title))(settings)
+  const alchemistSettings = useCallback((alchemist: ds.Alchemist) =>
+    Optic.get(_alchemist(alchemist.name, alchemist.title))(settings),
+    [settings])
 
   const [, allEffects] = useMemo(() => {
     const configs = search(recipe, [], alchemistSettings)
     const effects = effectsOfConfigurations(isConsumable, configs)
     return [configs, effects]
-  }, [recipe, isConsumable])
+  }, [recipe, isConsumable, alchemistSettings])
 
   const [candidateConfigs, candidateEffects] = useMemo(() => {
     const configs = search(recipe, desiredEffects, alchemistSettings)
     const effects = effectsOfConfigurations(isConsumable, configs)
     return [configs, effects]
-  }, [recipe, desiredEffects, isConsumable])
+  }, [recipe, desiredEffects, isConsumable, alchemistSettings])
 
   return <>
     <Helmet>
