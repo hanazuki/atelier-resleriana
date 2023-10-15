@@ -25,13 +25,22 @@ const RecipeList: React.FC = () => {
         return {
           menuItem: { key: c, content: d },
           render: () => {
-            const recipes = ds.recipes.filter(r => r.category === c)
+            const recipes: Record<string, ds.Recipe[]> = {}
+            for (const recipe of ds.recipes.filter(r => r.category === c)) {
+              (recipes[recipe.series] ||= []).push(recipe)
+            }
+
             return <Tab.Pane>
-              <List as='ul'>
-                {recipes.map(r =>
-                  <List.Item key={r.name} as='li'>
-                    <Link to={`/recipes/${r.name}`}>{r.name}</Link>
-                  </List.Item>
+              <List>
+                {Object.entries(recipes).map(([series, rs]) =>
+                  <>
+                    <Header as='h3'>{series}</Header>
+                    {rs.map(r =>
+                      <List.Item key={r.name}>
+                        <Link to={`/recipes/${r.name}`}>{r.name}</Link>
+                      </List.Item>
+                    )}
+                  </>
                 )}
               </List>
             </Tab.Pane>
