@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export const useLocalStorage =
   <T>(key: string, fallbackValue: T | (() => T)): [T, React.Dispatch<React.SetStateAction<T>>] => {
-    const createFallbackValue = (): T =>
-      fallbackValue instanceof Function ? fallbackValue() : fallbackValue
+    const createFallbackValue = useCallback(
+      (): T => fallbackValue instanceof Function ? fallbackValue() : fallbackValue,
+      [fallbackValue],
+    )
 
     const [value, setValueInner] = useState<T>(() => {
       const json = localStorage.getItem(key)
@@ -45,7 +47,7 @@ export const useLocalStorage =
       return () => {
         removeEventListener('storage', listener)
       }
-    }, [key])
+    }, [key, createFallbackValue])
 
     return [value, setValue]
   }
