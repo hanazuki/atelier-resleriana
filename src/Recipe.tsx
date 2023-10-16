@@ -57,6 +57,24 @@ const synthesize = (config: Configuration, settings: GlobalSettings): Synthesis 
   }
 }
 
+type Cmp = -1 | 0 | 1
+
+const cmp = <T,>(a: T, b: T): Cmp =>
+  a === b ? 0 : a < b ? -1 : 1
+
+const cmpEffects = (a: string, b: string): Cmp => {
+  const split = (eff: string): string[] => {
+    const m = /【(?<cond>.*)】$/.exec(eff)
+    const cond = m ? m.groups!.cond : ''
+    eff = eff.slice(0, m?.index)
+    return [eff.split('').reverse().join(''), cond]
+  }
+
+  console.log(split(a))
+
+  return cmp(split(a), split(b))
+}
+
 const search = (
   recipe: ds.Recipe,
   desiredEffects: (string | null)[],
@@ -154,7 +172,7 @@ const effectsOfSyntheses = (syntheses: Synthesis[]): string[] => {
     }
   }
 
-  return Array.from(effects).sort((a, b) => a === b ? 0 : a.split('').reverse() < b.split('').reverse() ? -1 : 1)
+  return Array.from(effects).sort(cmpEffects)
 }
 
 
