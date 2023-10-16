@@ -70,8 +70,6 @@ const cmpEffects = (a: string, b: string): Cmp => {
     return [eff.split('').reverse().join(''), cond]
   }
 
-  console.log(split(a))
-
   return cmp(split(a), split(b))
 }
 
