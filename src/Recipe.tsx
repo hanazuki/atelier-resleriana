@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet'
 import { Card, Checkbox, Divider, Grid, Header, Icon, Input, List, Message, Segment } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
 import { GlobalSettings, _alchemist } from './global';
+import Title from './Title';
 
 type Configuration = {
   recipe: ds.Recipe
@@ -246,9 +246,7 @@ const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
   }, [recipe, desiredEffects, settings])
 
   return <>
-    <Helmet>
-      <title>{recipe.name}</title>
-    </Helmet>
+    <Title>{recipe.name}</Title>
     <Header as='h2'>{icon(recipe.category)}{recipe.name}</Header>
     <Header as='h3' attached='top'>素材</Header>
     <Segment attached>

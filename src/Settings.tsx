@@ -1,9 +1,9 @@
 import React from 'react'
 import { Button, Card, Checkbox, Divider, Dropdown, List, Tab } from 'semantic-ui-react'
-import { Helmet } from 'react-helmet'
 import * as Optic from '@fp-ts/optic'
 import { AlchemistSettings, GlobalSettings, _alchemist } from './global'
 import * as ds from './dataset'
+import Title from './Title'
 
 interface SettingsProps {
   settings: GlobalSettings
@@ -74,9 +74,7 @@ const Settings: React.FC<SettingsProps> = ({ settings: globalSettings, setSettin
   ]
 
   return <>
-    <Helmet>
-      <title>設定</title>
-    </Helmet>
+    <Title>設定</Title>
     <Tab panes={panes} />
   </>
 }

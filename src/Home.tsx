@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header, List, Tab } from 'semantic-ui-react'
 import * as ds from './dataset';
-import { Helmet } from 'react-helmet';
+import Title from './Title';
 
 const recipeCategories: [ds.ItemCategory, string][] = [
   [ds.ItemCategory.HEAL, '回復'],
@@ -16,9 +16,7 @@ const recipeCategories: [ds.ItemCategory, string][] = [
 
 const RecipeList: React.FC = () => {
   return <>
-    <Helmet>
-      <title>どれをつくろう？</title>
-    </Helmet>
+    <Title>どれをつくろう？</Title>
     <Header as='h2'>レシピ</Header>
     <Tab menu={{ fluid: true, vertical: true, tabular: true }} panes={
       recipeCategories.map(([c, d]) => {
