@@ -31,18 +31,18 @@ const RecipeList: React.FC = () => {
             }
 
             return <Tab.Pane>
-              <List>
-                {Object.entries(recipes).map(([series, rs]) =>
-                  <>
-                    <Header as='h3'>{series}</Header>
+              {Object.entries(recipes).map(([series, rs]) =>
+                <React.Fragment key={series}>
+                  <Header as='h3'>{series}</Header>
+                  <List>
                     {rs.map(r =>
                       <List.Item key={r.name}>
                         <Link to={`/recipes/${r.name}`}>{r.name}</Link>
                       </List.Item>
                     )}
-                  </>
-                )}
-              </List>
+                  </List>
+                </React.Fragment>
+              )}
             </Tab.Pane>
           }
         }
