@@ -49,7 +49,7 @@ const Settings: React.FC = () => {
 
   const panes = [
     {
-      menuItem: { content: '錬金術師' },
+      menuItem: { key: 'alchemists', content: '錬金術師' },
       render: () => <Tab.Pane>
         <Card.Group>
           {alchemistSettings()}
@@ -57,7 +57,7 @@ const Settings: React.FC = () => {
       </Tab.Pane>,
     },
     {
-      menuItem: { content: '設定管理' },
+      menuItem: { key: 'management', content: '設定管理' },
       render: () => <Tab.Pane>
         <Button negative onClick={() => setGlobalSettings({ alchemists: {} })}>💣 設定を初期化 💣</Button>
         <Divider />
