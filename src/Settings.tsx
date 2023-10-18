@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Card, Checkbox, Divider, Dropdown, List, Tab } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
-import { AlchemistSettings, GlobalSettings, _alchemist } from './global'
+import { _alchemist } from './global'
 import * as ds from './dataset'
 import Title from './Title'
 import { useGlobalSettings } from './GlobalSettingsProvider'
@@ -20,7 +20,7 @@ const Settings: React.FC = () => {
 
     return ds.alchemists.map(a => {
       const _a = _alchemist(a.name, a.title)
-      const s: AlchemistSettings = Optic.get(_a)(globalSettings)
+      const s = Optic.get(_a)(globalSettings)
 
       const setUnlocked = (unlocked: boolean): void => {
         setGlobalSettings(Optic.replace(_a.at('unlocked'))(unlocked)(globalSettings))
