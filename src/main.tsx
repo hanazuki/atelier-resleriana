@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { useLocalStorage } from './hooks';
-import { GlobalSettings } from './global';
+import GlobalSettingsProvider from './GlobalSettingsProvider'
 import Root from './Root';
 import Home from './Home'
 import Settings from './Settings'
@@ -10,10 +9,6 @@ import Recipe from './Recipe'
 import 'semantic-ui-css/semantic.min.css';
 
 const App: React.FC = () => {
-  const [globalSettings, setGlobalSettings] = useLocalStorage<GlobalSettings>('atelier_resleriana_settings', {
-    alchemists: {},
-  })
-
   const router = createHashRouter([
     {
       path: '/',
@@ -25,18 +20,20 @@ const App: React.FC = () => {
         },
         {
           path: 'settings',
-          element: <Settings settings={globalSettings} setSettings={setGlobalSettings} />
+          element: <Settings />
         },
         {
           path: 'recipes/:recipeName',
-          element: <Recipe settings={globalSettings} />
+          element: <Recipe />
         },
       ],
     }
   ])
 
   return <React.StrictMode>
-    <RouterProvider router={router} />
+    <GlobalSettingsProvider>
+      <RouterProvider router={router} />
+    </GlobalSettingsProvider>
   </React.StrictMode>
 }
 

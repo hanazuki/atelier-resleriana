@@ -4,14 +4,11 @@ import * as Optic from '@fp-ts/optic'
 import { AlchemistSettings, GlobalSettings, _alchemist } from './global'
 import * as ds from './dataset'
 import Title from './Title'
+import { useGlobalSettings } from './GlobalSettingsProvider'
 
-interface SettingsProps {
-  settings: GlobalSettings
-  setSettings: (s: GlobalSettings) => void
-}
+const Settings: React.FC = () => {
+  const [globalSettings, setGlobalSettings] = useGlobalSettings()
 
-
-const Settings: React.FC<SettingsProps> = ({ settings: globalSettings, setSettings: setGlobalSettings }) => {
   const alchemistSettings = () => {
     const rarityIncreaseOptions = [
       0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80,

@@ -5,6 +5,7 @@ import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
 import { GlobalSettings, _alchemist } from './global';
 import Title from './Title';
+import { useGlobalSettings } from './GlobalSettingsProvider';
 
 type Configuration = {
   recipe: ds.Recipe
@@ -217,10 +218,11 @@ const maxCandidatesToShow = 100
 
 interface RecipeProps {
   recipe: ds.Recipe
-  settings: GlobalSettings
 }
 
-const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
+const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
+  const [globalSettings] = useGlobalSettings()
+
   const isConsumable = recipe.category.startsWith(ds.ItemType.CONSUMABLE)
 
   const [desiredEffects, setDesiredEffects] = useState<string[]>([])
@@ -234,16 +236,16 @@ const Recipe: React.FC<RecipeProps> = ({ recipe, settings }) => {
   }, [desiredEffects])
 
   const [, allEffects] = useMemo(() => {
-    const syntheses = search(recipe, [], settings)
+    const syntheses = search(recipe, [], globalSettings)
     const effects = effectsOfSyntheses(syntheses)
     return [syntheses, effects]
-  }, [recipe, settings])
+  }, [recipe, globalSettings])
 
   const [candidateSyntheses, candidateEffects] = useMemo(() => {
-    const syntheses = search(recipe, desiredEffects, settings)
+    const syntheses = search(recipe, desiredEffects, globalSettings)
     const effects = effectsOfSyntheses(syntheses)
     return [syntheses, effects]
-  }, [recipe, desiredEffects, settings])
+  }, [recipe, desiredEffects, globalSettings])
 
   return <>
     <Title>{recipe.name}</Title>
