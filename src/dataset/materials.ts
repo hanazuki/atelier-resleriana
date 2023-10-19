@@ -1,6 +1,6 @@
-import { Ingredient, Color, ItemType } from './types';
+import { Material, Color, ItemType } from './types';
 
-const i = (name: string, color: Color, effectType: ItemType, effects: string[]): Ingredient => {
+const i = (name: string, color: Color, effectType: ItemType, effects: string[]): Material => {
   return {
     name,
     color,
@@ -11,7 +11,7 @@ const i = (name: string, color: Color, effectType: ItemType, effects: string[]):
 
 const t = ItemType
 
-const ingredients: Ingredient[] = [
+const materials: Material[] = [
   i('三つ子トーン', 'R', t.CONSUMABLE, ['鳥特攻', '鳥特防']),
   i('コゲクサ', 'R', t.CONSUMABLE, ['火の呪詛', '守護の祝福']),
   i('貯ミツアリ', 'R', t.CONSUMABLE, ['雷の祝福', '雷の盾']),
@@ -158,6 +158,4 @@ const ingredients: Ingredient[] = [
   //i('', 'P', t.EQUIPMENT, ['', '']),
 ];
 
-
-
-export default ingredients;
+export default materials;

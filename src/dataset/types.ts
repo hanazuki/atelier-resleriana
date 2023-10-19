@@ -41,7 +41,7 @@ export type Recipe = {
   }[];
 }
 
-export type Ingredient = {
+export type Material = {
   name: string;
   color: Color;
   effectType: ItemType;

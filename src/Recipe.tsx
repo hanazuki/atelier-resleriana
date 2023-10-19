@@ -11,7 +11,7 @@ type Configuration = {
   recipe: ds.Recipe
   alchemist1: ds.Alchemist
   alchemist2: ds.Alchemist
-  extraIngredient: ds.Ingredient
+  extraIngredient: ds.Material
 }
 
 type Synthesis = {
@@ -37,7 +37,7 @@ const synthesize = (config: Configuration, settings: GlobalSettings): Synthesis 
 
   const alchemistEffects = (alchemist: ds.Alchemist) =>
     isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]
-  const ingredientEffects = (ingredient: ds.Ingredient) =>
+  const ingredientEffects = (ingredient: ds.Material) =>
     isConsumable === (ingredient.effectType === ds.ItemType.CONSUMABLE) ? ingredient.effects : []
 
   const effects = {
@@ -90,7 +90,7 @@ const search = (
       if (alchemist1.color2 !== alchemist2.color1) continue
       if (alchemist1.name === alchemist2.name) continue
 
-      for (const extraIngredient of ds.ingredients) {
+      for (const extraIngredient of ds.materials) {
         if (alchemist2.color2 !== extraIngredient.color) continue
         if (!recipe.category.startsWith(extraIngredient.effectType)) continue
 
@@ -198,7 +198,7 @@ const AlchemistCard: React.FC<{
 }
 
 const IngredientCard: React.FC<{
-  ingredient: ds.Ingredient,
+  ingredient: ds.Material,
   effects: { name: string; active: boolean }[],
   desiredEffects: string[],
 }> = ({ ingredient, effects, desiredEffects }) => {
