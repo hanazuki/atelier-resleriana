@@ -8,7 +8,7 @@ const r = (series: string, category: ItemCategory, name: string, colors: [Color,
     category,
     name,
     colors,
-    ingredients: ingredients.map(([name, count]) => ({ name, count })),
+    ingredients: ingredients.map(([material, count]) => ({ material, count })),
   };
 }
 

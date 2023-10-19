@@ -36,7 +36,7 @@ export type Recipe = {
   name: string;
   colors: Color[];
   ingredients: {
-    name: string;
+    material: string;
     count: number;
   }[];
 }

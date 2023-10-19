@@ -254,7 +254,7 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
     <Segment attached>
       <List>
         {recipe.ingredients.map(i =>
-          <List.Item key={i.name}><Link to={`/ingredients/${i.name}`}>{i.name}</Link> ({i.count})</List.Item>
+          <List.Item key={i.material}><Link to={`/materials/${i.material}`}>{i.material}</Link> ({i.count})</List.Item>
         )}
       </List>
     </Segment>
