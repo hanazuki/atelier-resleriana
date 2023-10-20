@@ -182,6 +182,14 @@ const colorCode = {
   'P': 'rgb(82% 12% 82%)',
 } as const
 
+const colorName = {
+  'R': '赤',
+  'B': '青',
+  'G': '緑',
+  'Y': '黄',
+  'P': '紫',
+} as const
+
 const prefersShapes = (): boolean => {
   const [globalSettings] = useGlobalSettings()
   return Optic.get(_ui.at('prefersShapes'))(globalSettings)
@@ -189,21 +197,21 @@ const prefersShapes = (): boolean => {
 
 const ColorIcon: React.FC<{ color: ds.Color }> = ({ color }) => {
   if (prefersShapes()) {
-    return <span>{`<${color}>`}</span>
+    return <span>{`<${colorName[color]}>`}</span>
   }
 
-  return <svg viewBox='0 0 10 10' style={{ display: 'inline-block', width: '1em', height: '1em' }}>
-    <title>{color}</title>
+  return <svg viewBox='0 0 10 10' style={{ display: 'inline-block', width: '1.2em', height: '1.2em', verticalAlign: 'text-bottom' }} role='graphics-symbol'>
+    <title>{colorName[color]}</title>
     <polygon points='0,5 5,0 10,5 5,10' fill={colorCode[color]} />
   </svg>
 }
 const ColorIcon2: React.FC<{ color1: ds.Color, color2: ds.Color }> = ({ color1, color2 }) => {
   if (prefersShapes()) {
-    return <span>{`<${color1}|${color2}>`}</span>
+    return <span>{`<${colorName[color1]}|${colorName[color2]}>`}</span>
   }
 
-  return <svg viewBox='0 0 10 10' style={{ display: 'inline-block', width: '1em', height: '1em' }}>
-    <title>{color1}|{color2}</title>
+  return <svg viewBox='0 0 10 10' style={{ display: 'inline-block', width: '1.2em', height: '1.2em', verticalAlign: 'text-bottom' }} role='graphics-symbol'>
+    <title>{colorName[color1]}|{colorName[color2]}</title>
     <polygon points='0,5 5,0 5,10' fill={colorCode[color1]} />
     <polygon points='10,5 5,10 5,0' fill={colorCode[color2]} />
   </svg>
@@ -217,10 +225,7 @@ const AlchemistCard: React.FC<{
 }> = ({ alchemist, rarityIncrease, effects, desiredEffects }) => {
   return <Card>
     <Card.Content>
-      <Card.Header style={{ display: 'flex' }}>
-        <div style={{ flex: '1' }}>{alchemist.name}</div>
-        <div><ColorIcon2 color1={alchemist.color1} color2={alchemist.color2} /></div>
-      </Card.Header>
+      <Card.Header>{alchemist.name}</Card.Header>
       <Card.Meta>{alchemist.title}</Card.Meta>
       <Card.Description>
         {effects.map(({ name }) =>
@@ -228,8 +233,9 @@ const AlchemistCard: React.FC<{
         )}
       </Card.Description>
     </Card.Content>
-    <Card.Content extra textAlign='right'>
-      +{rarityIncrease}%
+    <Card.Content extra style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ flex: 1 }}><ColorIcon2 color1={alchemist.color1} color2={alchemist.color2} /></div>
+      <div>+{rarityIncrease}%</div>
     </Card.Content>
   </Card>
 }
@@ -241,15 +247,15 @@ const IngredientCard: React.FC<{
 }> = ({ ingredient, effects, desiredEffects }) => {
   return <Card>
     <Card.Content>
-      <Card.Header style={{ display: 'flex' }}>
-        <div style={{ flex: '1' }}>{ingredient.name}</div>
-        <div><ColorIcon color={ingredient.color} /></div>
-      </Card.Header>
+      <Card.Header>{ingredient.name}</Card.Header>
       <Card.Description>
         {effects.map(({ name }) =>
           <div key={name}>{desiredEffects.includes(name) ? <strong>{name}</strong> : name}</div>
         )}
       </Card.Description>
+    </Card.Content>
+    <Card.Content extra style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ flex: 1 }}><ColorIcon color={ingredient.color} /></div>
     </Card.Content>
   </Card>
 }
