@@ -3,9 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { Card, Checkbox, Divider, Grid, Header, Icon, Input, List, Message, Segment } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
-import { GlobalSettings, _alchemist } from './global';
+import { _alchemist } from './global';
 import Title from './Title';
-import { useGlobalSettings } from './GlobalSettingsProvider';
+import { useGlobalSettings, GlobalSettings } from './GlobalSettingsProvider';
 
 type Configuration = {
   recipe: ds.Recipe
@@ -27,8 +27,8 @@ type Synthesis = {
   }
 }
 
-const _unlocked = (alchemist: ds.Alchemist) =>
-  _alchemist(alchemist.name, alchemist.title).at('unlocked')
+const _disabled = (alchemist: ds.Alchemist) =>
+  _alchemist(alchemist.name, alchemist.title).at('disabled')
 const _rarityIncrease = (alchemist: ds.Alchemist) =>
   _alchemist(alchemist.name, alchemist.title).at('rarityIncrease')
 
@@ -82,11 +82,11 @@ const search = (
   const syntheses: Synthesis[] = []
 
   for (const alchemist1 of ds.alchemists) {
-    if (!Optic.get(_unlocked(alchemist1))(settings)) continue;
+    if (Optic.get(_disabled(alchemist1))(settings)) continue;
     if (!recipe.colors.includes(alchemist1.color1)) continue
 
     for (const alchemist2 of ds.alchemists) {
-      if (!Optic.get(_unlocked(alchemist2))(settings)) continue;
+      if (Optic.get(_disabled(alchemist2))(settings)) continue;
       if (alchemist1.color2 !== alchemist2.color1) continue
       if (alchemist1.name === alchemist2.name) continue
 

@@ -22,8 +22,8 @@ const Settings: React.FC = () => {
       const _a = _alchemist(a.name, a.title)
       const s = Optic.get(_a)(globalSettings)
 
-      const setUnlocked = (unlocked: boolean): void => {
-        setGlobalSettings(Optic.replace(_a.at('unlocked'))(unlocked)(globalSettings))
+      const setDisabled = (disabled: boolean): void => {
+        setGlobalSettings(Optic.replace(_a.at('disabled'))(disabled)(globalSettings))
       }
 
       const setRarityIncrease = (chance: number): void => {
@@ -37,7 +37,7 @@ const Settings: React.FC = () => {
         </Card.Content>
         <Card.Content extra style={{ display: 'flex', alignItems: 'center' }}>
           <div style={{ flex: 1 }}>
-            <Checkbox toggle checked={s.unlocked} onChange={(_e, data) => setUnlocked(!!data.checked)} aria-label='解放済み' />
+            <Checkbox toggle checked={!s.disabled} onChange={(_e, data) => setDisabled(!data.checked)} aria-label='解放済み' />
           </div>
           <div>
             <Dropdown inline options={rarityIncreaseOptions} value={s.rarityIncrease} onChange={(_e, data) => setRarityIncrease(Number(data.value))} aria-label='ギフトボーナス' />

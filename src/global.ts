@@ -1,20 +1,9 @@
 import * as Optic from '@fp-ts/optic'
+import { PlainMessage } from '@bufbuild/protobuf'
+import { GlobalSettings, AlchemistSettings } from './gen/settings_pb'
 import { keyOrDefault } from './optics'
 
-export type AlchemistSettings = {
-  unlocked: boolean
-  rarityIncrease: number
-}
-
-export type GlobalSettings = {
-  alchemists: {
-    [k: `${string}/${string}`]: AlchemistSettings
-  }
-}
-
 export const _alchemist = (name: string, title: string) =>
-  Optic.id<GlobalSettings>().at('alchemists')
-    .compose(keyOrDefault(`${name}/${title}`, () => ({
-      unlocked: true,
-      rarityIncrease: 0,
-    })))
+  Optic.id<PlainMessage<GlobalSettings>>()
+    .at('alchemists')
+    .compose(keyOrDefault(`${name}/${title}`, () => new AlchemistSettings()))

@@ -18,13 +18,7 @@ export default defineConfig({
           thirdParty: {
             includePrivate: false,
             allow: {
-              test: (dependency) => {
-                if (!dependency.license) return false;
-                return [
-                  'MIT',
-                  'BSD-3-Clause'
-                ].includes(dependency.license);
-              },
+              test: 'MIT OR BSD-3-Clause OR Apache-2.0',
               failOnUnlicensed: true,
               failOnViolation: true,
             },

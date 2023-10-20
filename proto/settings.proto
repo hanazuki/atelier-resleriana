@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message GlobalSettings {
+  UISettings ui = 1;
+
+  map<string, AlchemistSettings> alchemists = 11;
+}
+
+message UISettings {
+  bool prefers_shapes = 1;
+}
+
+message AlchemistSettings {
+  bool disabled = 1;
+  uint32 rarity_increase = 2;
+}
