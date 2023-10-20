@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Card, Checkbox, Divider, Grid, Header, Icon, Input, List, Message, Segment } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
 import * as ds from './dataset'
-import { _alchemist } from './global';
+import { _alchemist, _ui } from './global';
 import Title from './Title';
 import { useGlobalSettings, GlobalSettings } from './GlobalSettingsProvider';
 
@@ -174,6 +174,40 @@ const effectsOfSyntheses = (syntheses: Synthesis[]): string[] => {
   return Array.from(effects).sort(cmpEffects)
 }
 
+const colorCode = {
+  'R': 'rgb(82% 12% 12%)',
+  'B': 'rgb(12% 12% 82%)',
+  'G': 'rgb(12% 82% 12%)',
+  'Y': 'rgb(82% 82% 12%)',
+  'P': 'rgb(82% 12% 82%)',
+} as const
+
+const prefersShapes = (): boolean => {
+  const [globalSettings] = useGlobalSettings()
+  return Optic.get(_ui.at('prefersShapes'))(globalSettings)
+}
+
+const ColorIcon: React.FC<{ color: ds.Color }> = ({ color }) => {
+  if (prefersShapes()) {
+    return <span>{`<${color}>`}</span>
+  }
+
+  return <svg viewBox='0 0 10 10' style={{ display: 'inline-block', width: '1em', height: '1em' }}>
+    <title>{color}</title>
+    <polygon points='0,5 5,0 10,5 5,10' fill={colorCode[color]} />
+  </svg>
+}
+const ColorIcon2: React.FC<{ color1: ds.Color, color2: ds.Color }> = ({ color1, color2 }) => {
+  if (prefersShapes()) {
+    return <span>{`<${color1}|${color2}>`}</span>
+  }
+
+  return <svg viewBox='0 0 10 10' style={{ display: 'inline-block', width: '1em', height: '1em' }}>
+    <title>{color1}|{color2}</title>
+    <polygon points='0,5 5,0 5,10' fill={colorCode[color1]} />
+    <polygon points='10,5 5,10 5,0' fill={colorCode[color2]} />
+  </svg>
+}
 
 const AlchemistCard: React.FC<{
   alchemist: ds.Alchemist,
@@ -183,7 +217,10 @@ const AlchemistCard: React.FC<{
 }> = ({ alchemist, rarityIncrease, effects, desiredEffects }) => {
   return <Card>
     <Card.Content>
-      <Card.Header>{alchemist.name}</Card.Header>
+      <Card.Header style={{ display: 'flex' }}>
+        <div style={{ flex: '1' }}>{alchemist.name}</div>
+        <div><ColorIcon2 color1={alchemist.color1} color2={alchemist.color2} /></div>
+      </Card.Header>
       <Card.Meta>{alchemist.title}</Card.Meta>
       <Card.Description>
         {effects.map(({ name }) =>
@@ -204,7 +241,10 @@ const IngredientCard: React.FC<{
 }> = ({ ingredient, effects, desiredEffects }) => {
   return <Card>
     <Card.Content>
-      <Card.Header>{ingredient.name}</Card.Header>
+      <Card.Header style={{ display: 'flex' }}>
+        <div style={{ flex: '1' }}>{ingredient.name}</div>
+        <div><ColorIcon color={ingredient.color} /></div>
+      </Card.Header>
       <Card.Description>
         {effects.map(({ name }) =>
           <div key={name}>{desiredEffects.includes(name) ? <strong>{name}</strong> : name}</div>
@@ -272,7 +312,10 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
         </Segment>
       </Grid.Column>
       <Grid.Column width={12}>
-        <Header as='h3' attached='top'>編成 ({candidateSyntheses.length})</Header>
+        <Header as='h3' attached='top' style={{ display: 'flex' }}>
+          <div style={{ flex: 1 }}>編成 ({candidateSyntheses.length})</div>
+          <div>{recipe.colors.map(c => <ColorIcon key={c} color={c} />)}</div>
+        </Header>
         <Segment attached>
           {candidateSyntheses.map((synthesis, i) => {
             return <div key={`${synthesis.config.alchemist1.name}${synthesis.config.alchemist1.title}${synthesis.config.alchemist2.name}${synthesis.config.alchemist2.name}${synthesis.config.extraIngredient.name}`}>
