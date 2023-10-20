@@ -5,6 +5,15 @@ import { _alchemist, _ui } from './global'
 import * as ds from './dataset'
 import Title from './Title'
 import { useGlobalSettings } from './GlobalSettingsProvider'
+import { GlobalSettings as pb_GlobalSettings } from './gen/settings_pb'
+
+const toDataURL = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.addEventListener('load', e => resolve(e.target!.result as string))
+    reader.addEventListener('error', e => reject(e.target!.error))
+    reader.readAsDataURL(blob)
+  })
 
 const UISettings: React.FC = () => {
   const [globalSettings, setGlobalSettings] = useGlobalSettings()
@@ -63,6 +72,33 @@ const Settings: React.FC = () => {
     })
   }
 
+  const exportSettings = async () => {
+    const url = toDataURL(new Blob(
+      [new pb_GlobalSettings(globalSettings).toBinary()],
+      { type: 'application/x-protobuf' },
+    ))
+
+    const a = document.createElement('a')
+    a.href = await url
+    a.download = 'atelier-resleriana.data'
+    a.style.display = 'none'
+    document.body.append(a)
+    a.click()
+    setTimeout(() => { a.remove() }, 0)
+  }
+
+  const importSettings = async (files: FileList) => {
+    const file = files[0]
+    if (file !== null) {
+      const reader = new FileReader()
+      reader.addEventListener('load', e => {
+        const data = e.target!.result as ArrayBuffer
+        setGlobalSettings(pb_GlobalSettings.fromBinary(new Uint8Array(data)))
+      })
+      reader.readAsArrayBuffer(file)
+    }
+  }
+
   const panes = [
     {
       menuItem: { key: 'alchemists', content: '錬金術師' },
@@ -80,15 +116,24 @@ const Settings: React.FC = () => {
     },
     {
       menuItem: { key: 'management', content: '設定管理' },
-      render: () => <Tab.Pane>
-        <Button negative onClick={() => setGlobalSettings({ alchemists: {} })}>💣 設定を初期化 💣</Button>
-        <Divider />
-        <List>
-          <List.Item>Repo: <a href="https://github.com/hanazuki/atelier-resleriana">https://github.com/hanazuki/atelier-resleriana</a></List.Item>
-          <List.Item>Commit: {import.meta.env.GIT_COMMIT_SHA}</List.Item>
-          <List.Item>Legal notices: <a href="./assets/vendor.LICENSE.txt">vendor.LICENSE.txt</a></List.Item>
-        </List>
-      </Tab.Pane>
+      render: () => {
+        return <Tab.Pane>
+          <Button onClick={exportSettings}>設定をエクスポート</Button>
+          <Button as='label'>
+            <input type='file' style={{ display: 'none' }}
+              onChange={(e) => e.target.files && importSettings(e.target.files)} />
+            設定をインポート
+          </Button>
+          <Button negative onClick={() => setGlobalSettings({ alchemists: {} })}>💣 設定を初期化 💣</Button>
+          <Divider />
+          <List>
+            <List.Item>Repo: <a href="https://github.com/hanazuki/atelier-resleriana">https://github.com/hanazuki/atelier-resleriana</a></List.Item>
+            <List.Item>Commit: {import.meta.env.GIT_COMMIT_SHA}</List.Item>
+            <List.Item>Legal notices: <a href="./assets/vendor.LICENSE.txt">vendor.LICENSE.txt</a></List.Item>
+          </List>
+        </Tab.Pane >
+      }
+
     },
   ]
 
