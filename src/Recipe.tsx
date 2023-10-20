@@ -74,6 +74,12 @@ const cmpEffects = (a: string, b: string): Cmp => {
   return cmp(split(a), split(b))
 }
 
+const possibleEffects = (synthesis: Synthesis) => [
+  ...synthesis.effects.alchemist1,
+  ...synthesis.effects.alchemist2,
+  ...synthesis.effects.extraIngredient,
+]
+
 const search = (
   recipe: ds.Recipe,
   desiredEffects: (string | null)[],
@@ -96,14 +102,9 @@ const search = (
 
         const config = { recipe, alchemist1, alchemist2, extraIngredient }
         const synthesis = synthesize(config, settings)
+        const effects = possibleEffects(synthesis)
 
-        const possibleEffects = [
-          ...synthesis.effects.alchemist1,
-          ...synthesis.effects.alchemist2,
-          ...synthesis.effects.extraIngredient,
-        ]
-
-        if (desiredEffects.every(e => e === null || possibleEffects.some(({ name: pe }) => pe === e))) {
+        if (desiredEffects.every(e => e === null || effects.some(({ name }) => name === e))) {
           syntheses.push(synthesis)
         }
       }
@@ -111,11 +112,16 @@ const search = (
   }
 
   return syntheses.sort(
-    (a, b) => {
+    (a, b) => (() => {
+      const effa = possibleEffects(a).filter(({ name }) => desiredEffects.includes(name))
+      const effb = possibleEffects(b).filter(({ name }) => desiredEffects.includes(name))
+      if (effa.length > 1 || effb.length > 1) console.log({ a, b })
+      return cmp(effb.length, effa.length)
+    })() || (() => {
       const ria = a.rarityIncrease.alchemist1 + a.rarityIncrease.alchemist2
       const rib = b.rarityIncrease.alchemist1 + b.rarityIncrease.alchemist2
-      return rib - ria
-    }
+      return cmp(rib, ria)
+    })()
   )
 }
 
