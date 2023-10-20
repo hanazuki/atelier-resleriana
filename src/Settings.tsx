@@ -1,10 +1,26 @@
 import React from 'react'
 import { Button, Card, Checkbox, Divider, Dropdown, List, Tab } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
-import { _alchemist } from './global'
+import { _alchemist, _ui } from './global'
 import * as ds from './dataset'
 import Title from './Title'
 import { useGlobalSettings } from './GlobalSettingsProvider'
+
+const UISettings: React.FC = () => {
+  const [globalSettings, setGlobalSettings] = useGlobalSettings()
+
+  const _prefersShapes = _ui.at('prefersShapes')
+
+  return <>
+    <List>
+      <List.Item>
+        <Checkbox toggle label="色以外で区別する"
+          checked={Optic.get(_prefersShapes)(globalSettings)}
+          onChange={(_e, data) => setGlobalSettings(Optic.replace(_prefersShapes)(!!data.checked)(globalSettings))} />
+      </List.Item>
+    </List>
+  </>
+}
 
 const Settings: React.FC = () => {
   const [globalSettings, setGlobalSettings] = useGlobalSettings()
@@ -54,6 +70,12 @@ const Settings: React.FC = () => {
         <Card.Group>
           {alchemistSettings()}
         </Card.Group>
+      </Tab.Pane>,
+    },
+    {
+      menuItem: { key: 'ui', content: 'UI' },
+      render: () => <Tab.Pane>
+        <UISettings />
       </Tab.Pane>,
     },
     {
