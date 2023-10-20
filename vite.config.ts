@@ -2,6 +2,7 @@ import * as path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import preload from 'vite-plugin-preload'
 import license from 'rollup-plugin-license'
 import * as cp from 'child_process';
 
@@ -10,7 +11,11 @@ export default defineConfig({
   define: {
     'import.meta.env.GIT_COMMIT_SHA': JSON.stringify(cp.execSync('git rev-parse HEAD').toString()),
   },
-  plugins: [vanillaExtractPlugin(), react()],
+  plugins: [
+    vanillaExtractPlugin(),
+    react(),
+    preload(),
+  ],
   build: {
     rollupOptions: {
       plugins: [

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import { Menu, Container } from 'semantic-ui-react'
+import { Container, Loader, Menu } from 'semantic-ui-react'
 
 const Navbar: React.FC = () => {
   return <Menu fixed='top' inverted>
@@ -15,7 +15,9 @@ const Root: React.FC = () => {
   return <>
     <Navbar />
     <Container style={{ paddingBlock: '5em 1em', scrollPaddingBlockStart: '5em' }}>
-      <Outlet />
+      <Suspense fallback={<Loader active>読み込み中</Loader>}>
+        <Outlet />
+      </Suspense>
     </Container>
   </>
 }

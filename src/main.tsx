@@ -1,11 +1,8 @@
-import React from 'react'
+import React, { lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import GlobalSettingsProvider from './GlobalSettingsProvider'
 import Root from './Root';
-import Home from './Home'
-import Settings from './Settings'
-import Recipe from './Recipe'
 import 'semantic-ui-css/semantic.min.css';
 
 const App: React.FC = () => {
@@ -16,15 +13,15 @@ const App: React.FC = () => {
       children: [
         {
           path: '',
-          element: <Home />
+          Component: lazy(() => import('./Home')),
         },
         {
           path: 'settings',
-          element: <Settings />
+          Component: lazy(() => import('./Settings')),
         },
         {
           path: 'recipes/:recipeName',
-          element: <Recipe />
+          Component: lazy(() => import('./Recipe')),
         },
       ],
     }
