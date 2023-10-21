@@ -195,13 +195,14 @@ const colorName = {
   'P': '紫',
 } as const
 
-const prefersShapes = (): boolean => {
+const usePrefersShapes = (): boolean => {
   const [globalSettings] = useGlobalSettings()
   return Optic.get(_ui.at('prefersShapes'))(globalSettings)
 }
 
 const ColorIcon: React.FC<{ color: ds.Color }> = ({ color }) => {
-  if (prefersShapes()) {
+  const prefersShapes = usePrefersShapes()
+  if (prefersShapes) {
     return <span>{`<${colorName[color]}>`}</span>
   }
 
@@ -211,7 +212,8 @@ const ColorIcon: React.FC<{ color: ds.Color }> = ({ color }) => {
   </svg>
 }
 const ColorIcon2: React.FC<{ color1: ds.Color, color2: ds.Color }> = ({ color1, color2 }) => {
-  if (prefersShapes()) {
+  const prefersShapes = usePrefersShapes()
+  if (prefersShapes) {
     return <span>{`<${colorName[color1]}|${colorName[color2]}>`}</span>
   }
 
