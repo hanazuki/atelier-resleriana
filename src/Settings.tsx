@@ -120,7 +120,7 @@ const Settings: React.FC = () => {
         return <Tab.Pane>
           <Button onClick={exportSettings}>設定をエクスポート</Button>
           <Button as='label'>
-            <input type='file' style={{ display: 'none' }}
+            <input type='file' style={{ display: 'none' }} accept='.data'
               onChange={(e) => e.target.files && importSettings(e.target.files)} />
             設定をインポート
           </Button>
