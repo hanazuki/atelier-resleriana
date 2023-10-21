@@ -41,7 +41,7 @@ export const useLocalStorage = <T>(
 
       const json = ev.newValue
       if (json !== null) {
-        setValueInner(JSON.parse(json))
+        setValueInner(parse(json))
       } else {
         setValueInner(createFallbackValue())
       }
