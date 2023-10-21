@@ -115,7 +115,6 @@ const search = (
     (a, b) => (() => {
       const effa = possibleEffects(a).filter(({ name }) => desiredEffects.includes(name))
       const effb = possibleEffects(b).filter(({ name }) => desiredEffects.includes(name))
-      if (effa.length > 1 || effb.length > 1) console.log({ a, b })
       return cmp(effb.length, effa.length)
     })() || (() => {
       const ria = a.rarityIncrease.alchemist1 + a.rarityIncrease.alchemist2
