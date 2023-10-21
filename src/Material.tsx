@@ -1,17 +1,27 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { Header } from 'semantic-ui-react'
+import { Header, Segment } from 'semantic-ui-react'
 import Title from './Title'
 import * as ds from './dataset'
+import RecipeList from './RecipeList'
 
 interface MaterialProps {
   material: ds.Material
 }
 
 const Material: React.FC<MaterialProps> = ({ material }) => {
+  const recipes = ds.recipes
+    .filter(r => r.ingredients.some(i => i.material === material.name))
+
   return <>
     <Title>{material.name}</Title>
     <Header as='h2'>{material.name}</Header>
+    <Header as='h3' attached='top'>採集場所</Header>
+    <Segment attached='bottom'></Segment>
+    <Header as='h3' attached='top'>レシピ</Header>
+    <Segment attached='bottom'>
+      <RecipeList recipes={recipes} />
+    </Segment>
   </>
 }
 
