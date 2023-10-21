@@ -51,7 +51,7 @@ export const useLocalStorage = <T>(
     return () => {
       removeEventListener('storage', listener)
     }
-  }, [key, createFallbackValue])
+  }, [key, parse, createFallbackValue])
 
   return [value, setValue]
 }
