@@ -20,6 +20,10 @@ const App: React.FC = () => {
           Component: lazy(() => import('./Settings')),
         },
         {
+          path: 'materials/:materialName',
+          Component: lazy(() => import('./Material')),
+        },
+        {
           path: 'recipes/:recipeName',
           Component: lazy(() => import('./Recipe')),
         },
