@@ -1,40 +1,14 @@
-import React, { lazy } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createHashRouter, RouterProvider } from 'react-router-dom';
-import GlobalSettingsProvider from './GlobalSettingsProvider'
-import Root from './Root';
-import 'semantic-ui-css/semantic.min.css';
+import { createHashRouter, RouterProvider } from 'react-router-dom'
+import 'semantic-ui-css/semantic.min.css'
+import routes from './routes'
 
 const App: React.FC = () => {
-  const router = createHashRouter([
-    {
-      path: '/',
-      element: <Root />,
-      children: [
-        {
-          path: '',
-          Component: lazy(() => import('./Home')),
-        },
-        {
-          path: 'settings',
-          Component: lazy(() => import('./Settings')),
-        },
-        {
-          path: 'materials/:materialName',
-          Component: lazy(() => import('./Material')),
-        },
-        {
-          path: 'recipes/:recipeName',
-          Component: lazy(() => import('./Recipe')),
-        },
-      ],
-    }
-  ])
+  const router = createHashRouter(routes)
 
   return <React.StrictMode>
-    <GlobalSettingsProvider>
-      <RouterProvider router={router} />
-    </GlobalSettingsProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 }
 

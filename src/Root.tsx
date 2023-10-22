@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import { Container, Loader, Menu } from 'semantic-ui-react'
+import GlobalSettingsProvider from './GlobalSettingsProvider'
 
 const Navbar: React.FC = () => {
   return <Menu fixed='top' inverted>
@@ -12,14 +13,14 @@ const Navbar: React.FC = () => {
 }
 
 const Root: React.FC = () => {
-  return <>
+  return <GlobalSettingsProvider>
     <Navbar />
     <Container style={{ paddingBlock: '5em 1em', scrollPaddingBlockStart: '5em' }}>
       <Suspense fallback={<Loader active>読み込み中</Loader>}>
         <Outlet />
       </Suspense>
     </Container>
-  </>
+  </GlobalSettingsProvider>
 }
 
 export default Root
