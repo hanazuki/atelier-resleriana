@@ -1,5 +1,5 @@
-import React from 'react'
-import { Button, Card, Checkbox, Divider, Dropdown, List, Tab } from 'semantic-ui-react'
+import React, { useState } from 'react'
+import { Button, Card, Checkbox, Loader, Dimmer, Divider, Dropdown, List, Tab } from 'semantic-ui-react'
 import * as Optic from '@fp-ts/optic'
 import { _alchemist, _ui } from './global'
 import * as ds from './dataset'
@@ -27,6 +27,80 @@ const UISettings: React.FC = () => {
           checked={Optic.get(_prefersShapes)(globalSettings)}
           onChange={(_e, data) => setGlobalSettings(Optic.replace(_prefersShapes)(!!data.checked)(globalSettings))} />
       </List.Item>
+    </List>
+  </>
+}
+
+const SettingsManagement: React.FC = () => {
+  const [globalSettings, setGlobalSettings] = useGlobalSettings()
+
+  const [inProgress, setInProgress] = useState(false)
+
+  const exportSettings = async () => {
+    const url = toDataURL(new Blob(
+      [new pb_GlobalSettings(globalSettings).toBinary()],
+      { type: 'application/x-protobuf' },
+    ))
+
+    const a = document.createElement('a')
+    a.href = await url
+    a.download = 'atelier-resleriana.data'
+    a.style.display = 'none'
+    document.body.append(a)
+    a.click()
+    setTimeout(() => { a.remove() }, 0)
+  }
+
+  const showProgress = (promise: Promise<void>) => {
+    const timer = setTimeout(() => {
+      setInProgress(true)
+    }, 500)
+    promise.then(() => {
+      clearTimeout(timer)
+      setInProgress(false)
+    })
+  }
+
+  const importSettings = async (files: FileList): Promise<void> => {
+    const file = files[0]
+    if (file !== null) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.addEventListener('load', e => {
+          const data = e.target!.result as ArrayBuffer
+          setGlobalSettings(pb_GlobalSettings.fromBinary(new Uint8Array(data)))
+          resolve()
+        })
+        reader.addEventListener('error', e => {
+          reject(e.target!.error)
+        })
+        reader.readAsArrayBuffer(file)
+      })
+    }
+  }
+
+  const clearSettings = () => {
+    if (confirm('初期化しますか？')) {
+      setGlobalSettings(new pb_GlobalSettings())
+    }
+  }
+
+  return <>
+    <Dimmer active={inProgress}>
+      <Loader>処理中</Loader>
+    </Dimmer>
+    <Button onClick={exportSettings}>設定をエクスポート</Button>
+    <Button as='label'>
+      <input type='file' style={{ display: 'none' }} accept='.data'
+        onChange={(e) => e.target.files && showProgress(importSettings(e.target.files))} />
+      設定をインポート
+    </Button>
+    <Button negative onClick={clearSettings}>💣 設定を初期化 💣</Button>
+    <Divider />
+    <List>
+      <List.Item>Repo: <a href="https://github.com/hanazuki/atelier-resleriana">https://github.com/hanazuki/atelier-resleriana</a></List.Item>
+      <List.Item>Commit: {import.meta.env.GIT_COMMIT_SHA}</List.Item>
+      <List.Item>Legal notices: <a href="./assets/vendor.LICENSE.txt">vendor.LICENSE.txt</a></List.Item>
     </List>
   </>
 }
@@ -72,33 +146,6 @@ const Settings: React.FC = () => {
     })
   }
 
-  const exportSettings = async () => {
-    const url = toDataURL(new Blob(
-      [new pb_GlobalSettings(globalSettings).toBinary()],
-      { type: 'application/x-protobuf' },
-    ))
-
-    const a = document.createElement('a')
-    a.href = await url
-    a.download = 'atelier-resleriana.data'
-    a.style.display = 'none'
-    document.body.append(a)
-    a.click()
-    setTimeout(() => { a.remove() }, 0)
-  }
-
-  const importSettings = async (files: FileList) => {
-    const file = files[0]
-    if (file !== null) {
-      const reader = new FileReader()
-      reader.addEventListener('load', e => {
-        const data = e.target!.result as ArrayBuffer
-        setGlobalSettings(pb_GlobalSettings.fromBinary(new Uint8Array(data)))
-      })
-      reader.readAsArrayBuffer(file)
-    }
-  }
-
   const panes = [
     {
       menuItem: { key: 'alchemists', content: '錬金術師' },
@@ -116,24 +163,9 @@ const Settings: React.FC = () => {
     },
     {
       menuItem: { key: 'management', content: '設定管理' },
-      render: () => {
-        return <Tab.Pane>
-          <Button onClick={exportSettings}>設定をエクスポート</Button>
-          <Button as='label'>
-            <input type='file' style={{ display: 'none' }} accept='.data'
-              onChange={(e) => e.target.files && importSettings(e.target.files)} />
-            設定をインポート
-          </Button>
-          <Button negative onClick={() => setGlobalSettings({ alchemists: {} })}>💣 設定を初期化 💣</Button>
-          <Divider />
-          <List>
-            <List.Item>Repo: <a href="https://github.com/hanazuki/atelier-resleriana">https://github.com/hanazuki/atelier-resleriana</a></List.Item>
-            <List.Item>Commit: {import.meta.env.GIT_COMMIT_SHA}</List.Item>
-            <List.Item>Legal notices: <a href="./assets/vendor.LICENSE.txt">vendor.LICENSE.txt</a></List.Item>
-          </List>
-        </Tab.Pane >
-      }
-
+      render: () => <Tab.Pane>
+        <SettingsManagement />
+      </Tab.Pane>,
     },
   ]
 
