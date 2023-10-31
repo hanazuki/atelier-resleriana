@@ -1,8 +1,7 @@
 import React, { createContext, useContext } from "react"
 import { GlobalSettings as pb_GlobalSettings } from "./gen/settings_pb"
 import { useLocalStorage } from "./hooks"
-import { PlainMessage } from '@bufbuild/protobuf'
-import { Encode as encode64, Decode as decode64 } from 'arraybuffer-encoding/base64/url'
+import { PlainMessage, protoBase64 as base64 } from '@bufbuild/protobuf'
 
 export type GlobalSettings = PlainMessage<pb_GlobalSettings>
 
@@ -15,8 +14,8 @@ export const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const [globalSettings, setGlobalSettings] = useLocalStorage<GlobalSettings>(
     'atelier_resleriana_settings_pb',
     new pb_GlobalSettings(),
-    s => pb_GlobalSettings.fromBinary(new Uint8Array(decode64(s))),
-    v => encode64(new pb_GlobalSettings(v).toBinary()),
+    s => pb_GlobalSettings.fromBinary(base64.dec(s)),
+    v => base64.enc(new pb_GlobalSettings(v).toBinary()),
   )
 
   return <Context.Provider value={{ globalSettings, setGlobalSettings }}>
