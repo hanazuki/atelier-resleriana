@@ -1,10 +1,10 @@
 import * as path from 'node:path'
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import preact from '@preact/preset-vite'
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import preload from 'vite-plugin-preload'
 import license from 'rollup-plugin-license'
-import * as cp from 'child_process';
+import * as cp from 'child_process'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
   },
   plugins: [
     vanillaExtractPlugin(),
-    react(),
+    preact(),
     preload(),
   ],
   build: {
