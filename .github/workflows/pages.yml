@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.ref == 'refs/heads/main' && 'pages' || format('pages-{0}', github.sha) }}
+  group: ${{ github.ref == 'refs/heads/master' && 'pages' || format('pages-{0}', github.sha) }}
   cancel-in-progress: false
 
 jobs:
@@ -44,7 +44,7 @@ jobs:
 
   deploy:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
     permissions:
       pages: write
       id-token: write
