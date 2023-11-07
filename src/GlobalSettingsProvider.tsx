@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react"
 import { GlobalSettings as pb_GlobalSettings } from "./gen/settings_pb"
-import { useLocalStorage } from "./hooks"
+import { useLocalStorage } from "./hooks/localstorage"
 import { PlainMessage, protoBase64 as base64 } from '@bufbuild/protobuf'
 
 export type GlobalSettings = PlainMessage<pb_GlobalSettings>
