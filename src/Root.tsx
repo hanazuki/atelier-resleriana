@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, ScrollRestoration } from 'react-router-dom'
 import { Container, Loader, LoaderProps, Menu } from 'semantic-ui-react'
 import GlobalSettingsProvider from './GlobalSettingsProvider'
 
@@ -26,14 +26,17 @@ const DelayedLoader: React.FC<LoaderProps> = (props) => {
 }
 
 const Root: React.FC = () => {
-  return <GlobalSettingsProvider>
-    <Navbar />
-    <Container style={{ paddingBlock: '5em 1em', scrollPaddingBlockStart: '5em' }}>
-      <Suspense fallback={<DelayedLoader>読み込み中</DelayedLoader>}>
-        <Outlet />
-      </Suspense>
-    </Container>
-  </GlobalSettingsProvider>
+  return <>
+    <GlobalSettingsProvider>
+      <Navbar />
+      <Container style={{ paddingBlock: '5em 1em', scrollPaddingBlockStart: '5em' }}>
+        <Suspense fallback={<DelayedLoader>読み込み中</DelayedLoader>}>
+          <Outlet />
+        </Suspense>
+      </Container>
+    </GlobalSettingsProvider>
+    <ScrollRestoration />
+  </>
 }
 
 export default Root
