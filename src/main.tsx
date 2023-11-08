@@ -1,11 +1,15 @@
-import { render } from 'preact'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import { createHashRouter, RouterProvider } from 'react-router-dom'
 import 'semantic-ui-css/semantic.min.css'
 import routes from './routes'
 
-const App = () => {
+const App: React.FC = () => {
   const router = createHashRouter(routes)
-  return <RouterProvider router={router} />
+
+  return <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 }
 
-render(<App />, document.getElementById('root')!)
+ReactDOM.createRoot(document.getElementById('root')!).render(<App />)
