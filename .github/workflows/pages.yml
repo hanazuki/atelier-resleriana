@@ -32,11 +32,26 @@ jobs:
       - name: Install
         run: |
           npm ci
+      - name: Install Playwright browsers
+        run: |
+          npm run install:e2e
       - name: Build
         run: |
           npm run build -- --base "$BASE_PATH"/
         env:
           BASE_PATH: ${{ steps.gh-pages.outputs.base_path }}
+      - name: Run Playwright tests
+        run: |
+          npm run test:e2e
+        env:
+          BASE_PATH: ${{ steps.gh-pages.outputs.base_path }}
+        timeout-minutes: 10
+      - name: Upload Playwright test report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
