@@ -32,6 +32,9 @@ jobs:
       - name: Install
         run: |
           npm ci
+      - name: Run Vitest tests
+        run: |
+          npm run test
       - name: Install Playwright browsers
         run: |
           npm run install:e2e
