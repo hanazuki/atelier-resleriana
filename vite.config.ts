@@ -1,10 +1,10 @@
 import * as path from 'node:path'
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import preload from 'vite-plugin-preload'
 import license from 'rollup-plugin-license'
-import * as cp from 'child_process';
+import * as cp from 'child_process'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,7 +19,9 @@ export default defineConfig({
   test: {
     include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     allowOnly: !process.env.CI,
-    globals: true,
+    setupFiles: [
+      './test/setup.ts',
+    ],
   },
   build: {
     rollupOptions: {
