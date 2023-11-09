@@ -1,5 +1,5 @@
 import * as path from 'node:path'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import preload from 'vite-plugin-preload'
@@ -16,6 +16,11 @@ export default defineConfig({
     react(),
     preload(),
   ],
+  test: {
+    include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    allowOnly: !process.env.CI,
+    globals: true,
+  },
   build: {
     rollupOptions: {
       plugins: [
