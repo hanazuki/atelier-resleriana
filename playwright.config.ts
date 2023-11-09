@@ -26,6 +26,8 @@ export default defineConfig({
   use: {
     baseURL: url,
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    actionTimeout: 5 * 1000,
   },
 
   projects: [
