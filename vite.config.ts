@@ -19,6 +19,7 @@ export default defineConfig({
   test: {
     include: ['src/**/*.{test,spec}.?(c|m)[jt]s?(x)'],
     allowOnly: !process.env.CI,
+    globals: true,
   },
   build: {
     rollupOptions: {
