@@ -41,5 +41,6 @@
   "minimumReleaseAge": "7 days",
   "internalChecksFilter": "none",
   "platformAutomerge": false,
-  "dependencyDashboard": false
+  "dependencyDashboard": false,
+  "prHourlyLimit": 0
 }
