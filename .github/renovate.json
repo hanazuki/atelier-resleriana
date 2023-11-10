@@ -30,6 +30,11 @@
       "groupName": "bufbuild-es monorepo",
       "matchSourceUrls": ["https://github.com/bufbuild/protobuf-es"],
       "matchUpdateTypes": ["digest", "major", "minor", "patch"]
+    },
+    {
+      "groupName": "typescript-eslint monorepo",
+      "matchSourceUrls": ["https://github.com/typescript-eslint/typescript-eslint"],
+      "matchUpdateTypes": ["digest", "major", "minor", "patch"]
     }
   ],
 
