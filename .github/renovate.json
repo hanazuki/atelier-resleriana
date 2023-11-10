@@ -1,0 +1,37 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "group:typescript-eslintMonorepo",
+  ],
+  "timezone": "Asia/Tokyo",
+  "labels": ["dependencies"],
+
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchDatasources": ["npm"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "groupName": "vitest monorepo",
+      "matchSourceUrls": ["https://github.com/vitest-dev/vitest"],
+      "matchUpdateTypes": ["digest", "major", "minor", "patch"]
+    },
+    {
+      "groupName": "playwright monorepo",
+      "matchSourceUrls": ["https://github.com/microsoft/playwright"],
+      "matchUpdateTypes": ["digest", "major", "minor", "patch"]
+    },
+    {
+      "groupName": "bufbuild-es monorepo",
+      "matchSourceUrls": ["https://github.com/bufbuild/protobuf-es"],
+      "matchUpdateTypes": ["digest", "major", "minor", "patch"]
+    }
+  ],
+
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "none",
+  "dependencyDashboard": false
+}
