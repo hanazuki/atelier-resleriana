@@ -23,6 +23,10 @@ const routes: RouteObject[] = [
         path: 'recipes/:recipeName',
         Component: lazy(() => import('./Recipe')),
       },
+      {
+        path: 'effects/:effectName',
+        Component: lazy(() => import('./Effect')),
+      },
     ],
   }
 ]
