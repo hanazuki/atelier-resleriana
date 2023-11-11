@@ -17,6 +17,11 @@
       "automerge": true
     },
     {
+      "groupName": "react monorepo",
+      "matchSourceUrls": ["https://github.com/facebook/react"],
+      "matchUpdateTypes": ["digest", "major", "minor", "patch"]
+    },
+    {
       "groupName": "vitest monorepo",
       "matchSourceUrls": ["https://github.com/vitest-dev/vitest"],
       "matchUpdateTypes": ["digest", "major", "minor", "patch"]
@@ -39,7 +44,6 @@
   ],
 
   "minimumReleaseAge": "7 days",
-  "internalChecksFilter": "none",
   "platformAutomerge": false,
   "dependencyDashboard": false,
   "prHourlyLimit": 0
