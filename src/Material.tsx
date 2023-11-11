@@ -1,6 +1,6 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
-import { Header, Segment } from 'semantic-ui-react'
+import { Link, useParams } from 'react-router-dom'
+import { Header, List, Segment } from 'semantic-ui-react'
 import Title from './Title'
 import * as ds from './dataset'
 import RecipeList from './RecipeList'
@@ -16,8 +16,19 @@ const Material: React.FC<MaterialProps> = ({ material }) => {
   return <>
     <Title>{material.name}</Title>
     <Header as='h2'>{material.name}</Header>
+
+    <Header as='h3' attached='top'>特性</Header>
+    <Segment attached='bottom'>
+      <List>
+        {material.effects.map(e => <List.Item key={e}>
+          <Link to={`/effects/${e}`}>{e}</Link>
+        </List.Item>)}
+      </List>
+    </Segment>
+
     <Header as='h3' attached='top'>採集場所</Header>
     <Segment attached='bottom'></Segment>
+
     <Header as='h3' attached='top'>レシピ</Header>
     <Segment attached='bottom'>
       <RecipeList recipes={recipes} />
