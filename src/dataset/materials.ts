@@ -1,4 +1,4 @@
-import { Material, Color, ItemType } from './types';
+import { Material, Color, ItemType } from './types'
 
 const i = (name: string, color: Color, effectType: ItemType, effects: string[]): Material => {
   return {
@@ -57,7 +57,7 @@ const materials: Material[] = [
   i('灰かぶり草', 'Y', t.CONSUMABLE, ['氷の祝福', '使い切り回復強化']),
   i('フェスト', 'Y', t.CONSUMABLE, ['大きな回復量', '魔力の呪詛']),
   i('ローズビー', 'Y', t.CONSUMABLE, ['風の盾', '雷の呪詛']),
-  i('赤曜石', 'Y', t.CONSUMABLE, ['突の呪詛', '魔防の祝福']),
+  i('赤曜鉱', 'Y', t.CONSUMABLE, ['突の呪詛', '魔防の祝福']),
   // i('', 'Y', t.CONSUMABLE, ['', '']),
 
   i('うにゾウムシ', 'P', t.CONSUMABLE, ['雷の呪詛', '雷の祝福']),
@@ -88,7 +88,7 @@ const materials: Material[] = [
   i('炭化樹皮', 'R', t.EQUIPMENT, ['単体攻撃威力上昇', '魔法耐性上昇【渾身】']),
   i('ナナシ草', 'R', t.EQUIPMENT, ['与ダメージ上昇', '物理耐性上昇']),
   i('ハチの巣', 'R', t.EQUIPMENT, ['斬ダメージ上昇', '斬耐性上昇']),
-  i('ベントナイト', 'R', t.EQUIPMENT, ['氷ダメージ上昇', '氷耐性上昇']),
+  i('ペントナイト', 'R', t.EQUIPMENT, ['氷ダメージ上昇', '氷耐性上昇']),
   i('オレンジグラス', 'R', t.EQUIPMENT, ['打ダメージ上昇', '火耐性上昇']),
   i('マグマパウダー', 'R', t.EQUIPMENT, ['魔法耐性上昇', 'ブレイクダメージ上昇']),
   i('アイヒェロア', 'R', t.EQUIPMENT, ['突ダメージ上昇', '風耐性上昇']),
