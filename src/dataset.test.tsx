@@ -1,3 +1,4 @@
+/// <reference path="../test/setup.d.ts" />
 import { test, describe, expect } from 'vitest'
 
 import * as ds from './dataset'
