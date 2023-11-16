@@ -8,7 +8,7 @@ const url = new URL(basePath || '', `http://localhost:${port}`).toString()
 const shellescape = (s: string | { toString: () => string }): string => {
   const s0 = typeof s !== 'string' ? s.toString() : s
   if (s0 === '') return "''"
-  return s0.replaceAll(/[^A-Za-z0-9_\-.,:+\/@\n]/g, c => `\\${c}`)
+  return s0.replaceAll(/[^A-Za-z0-9_\-.,:+/@\n]/g, c => `\\${c}`)
     .replaceAll(/\n/g, "'\n'")
 }
 
