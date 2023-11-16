@@ -11,6 +11,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  lint:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+      - name: Enable corepack for npm
+        run: |
+          corepack enable npm
+      - name: Install
+        run: |
+          npm ci
+      - name: Run eslint
+        run: |
+          npm run lint
+
   build:
     permissions:
       contents: read

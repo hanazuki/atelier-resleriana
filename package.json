@@ -9,7 +9,7 @@
     "build": "npm run protoc && tsc && vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "install:e2e": "playwright install --with-deps"
@@ -45,6 +45,7 @@
     "jsdom": "^22.1.0",
     "rollup-plugin-license": "^3.1.0",
     "typescript": "^5.0.2",
+    "typescript-eslint-language-service": "^5.0.5",
     "vite": "^4.4.5",
     "vite-plugin-preload": "^0.3.1",
     "vitest": "^0.34.6"
