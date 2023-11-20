@@ -14,4 +14,14 @@ describe('dataset', () => {
       }
     })
   })
+
+  describe('materials', () => {
+    test('effects', async () => {
+      for (const material of ds.materials) {
+        for (const effect of material.effects) {
+          expect(ds.effects).toPartiallyContain({ name: effect, itemType: material.effectType })
+        }
+      }
+    })
+  })
 })

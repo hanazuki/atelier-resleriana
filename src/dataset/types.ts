@@ -47,3 +47,18 @@ export type Material = {
   effectType: ItemType;
   effects: [string, string];
 };
+
+export const EffectCategory = {
+  ATTACK: 'ATTACK',
+  BUFF: 'BUFF',
+  DEBUFF: 'DEBUFF',
+  HEAL: 'HEAL',
+}
+
+export type EffectCategory = typeof EffectCategory[keyof typeof EffectCategory]
+
+export type Effect = {
+  name: string
+  itemType: ItemType
+  category: EffectCategory
+}
