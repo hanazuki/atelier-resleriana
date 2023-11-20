@@ -63,7 +63,7 @@ const SettingsManagement: React.FC = () => {
 
   const importSettings = async (files: FileList): Promise<void> => {
     const file = files[0]
-    if (file !== null) {
+    if (file != null) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.addEventListener('load', e => {

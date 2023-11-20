@@ -64,7 +64,7 @@ const cmp = <T,>(a: T, b: T): Cmp =>
 const cmpEffects = (a: string, b: string): Cmp => {
   const split = (eff: string): string[] => {
     const m = /【(?<cond>.*)】$/.exec(eff)
-    const cond = m ? m.groups!.cond : ''
+    const cond = m ? m.groups!.cond! : ''
     eff = eff.slice(0, m?.index)
     return [eff.split('').reverse().join(''), cond]
   }

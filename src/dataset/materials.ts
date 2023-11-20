@@ -1,6 +1,6 @@
 import { Material, Color, ItemType } from './types'
 
-const i = (name: string, color: Color, effectType: ItemType, effects: string[]): Material => {
+const i = (name: string, color: Color, effectType: ItemType, effects: [string, string]): Material => {
   return {
     name,
     color,

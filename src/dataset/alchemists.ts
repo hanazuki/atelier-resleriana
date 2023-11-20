@@ -1,6 +1,6 @@
 import type { Alchemist, Color } from './types';
 
-const a = (name: string, title: string, rarity: 1 | 2 | 3, color1: Color, color2: Color, effects: string[]): Alchemist => {
+const a = (name: string, title: string, rarity: 1 | 2 | 3, color1: Color, color2: Color, effects: [string, string, string]): Alchemist => {
   return {
     name,
     title,

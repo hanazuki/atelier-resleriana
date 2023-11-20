@@ -8,7 +8,7 @@ export type Alchemist = {
   rarity: AlchemistRarity
   color1: Color;
   color2: Color;
-  effects: string[];
+  effects: [string, string, string];
 }
 
 export const ItemType = {
@@ -45,5 +45,5 @@ export type Material = {
   name: string;
   color: Color;
   effectType: ItemType;
-  effects: string[];
+  effects: [string, string];
 };
