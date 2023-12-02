@@ -104,9 +104,14 @@ const AlchemistCard: React.FC<{
       <Card.Header>{alchemist.name}</Card.Header>
       <Card.Meta>{alchemist.title}</Card.Meta>
       <Card.Description>
-        {effects.map(({ name }) =>
-          <div key={name}>{desiredEffects.includes(name) ? <strong>{name}</strong> : name}</div>
-        )}
+        {effects.map(({ name, active }) => {
+          const nameHtml = active
+            ? desiredEffects.includes(name)
+              ? <strong>{name}</strong>
+              : name
+            : <s>{name}</s>
+          return <div key={name}>{nameHtml}</div>
+        })}
       </Card.Description>
     </Card.Content>
     <Card.Content extra style={{ display: 'flex', alignItems: 'center' }}>
@@ -145,6 +150,8 @@ interface RecipeProps {
 const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
   const [globalSettings] = useGlobalSettings()
 
+  const [allowIneffectiveAlchemists, setAllowIneffectiveAlchemists] = useState<boolean>(true);
+
   const isConsumable = recipe.category.startsWith(ds.ItemType.CONSUMABLE)
 
   const [desiredEffects, setDesiredEffects] = useState<string[]>([])
@@ -158,16 +165,16 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
   }, [desiredEffects])
 
   const [, allEffects] = useMemo(() => {
-    const syntheses = syn.search(recipe, [], globalSettings)
+    const syntheses = syn.search(recipe, [], globalSettings, allowIneffectiveAlchemists)
     const effects = syn.effectsOfSyntheses(syntheses)
     return [syntheses, effects]
-  }, [recipe, globalSettings])
+  }, [recipe, globalSettings, allowIneffectiveAlchemists])
 
   const [candidateSyntheses, candidateEffects] = useMemo(() => {
-    const syntheses = syn.search(recipe, desiredEffects, globalSettings)
+    const syntheses = syn.search(recipe, desiredEffects, globalSettings, allowIneffectiveAlchemists)
     const effects = syn.effectsOfSyntheses(syntheses)
     return [syntheses, effects]
-  }, [recipe, desiredEffects, globalSettings])
+  }, [recipe, desiredEffects, globalSettings, allowIneffectiveAlchemists])
 
   return <>
     <Title>{recipe.name}</Title>
@@ -199,6 +206,13 @@ const Recipe: React.FC<RecipeProps> = ({ recipe }) => {
           <div>{recipe.colors.map(c => <ColorIcon key={c} color={c} />)}</div>
         </Header>
         <Segment attached>
+          <List>
+            <List.Item>
+              <Checkbox toggle label="ギフトカラーの一致しない錬金術師を使う"
+                checked={allowIneffectiveAlchemists}
+                onChange={(_e, data) => setAllowIneffectiveAlchemists(!!data.checked)} />
+            </List.Item>
+          </List>
           {candidateSyntheses.map((synthesis, i) => {
             return <div key={`${synthesis.config.alchemist1.name}${synthesis.config.alchemist1.title}${synthesis.config.alchemist2.name}${synthesis.config.alchemist2.name}${synthesis.config.extraIngredient.name}`}>
               {i > 0 ? <Divider /> : null}
