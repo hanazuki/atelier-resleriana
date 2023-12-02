@@ -9,52 +9,79 @@ const _disabled = (alchemist: ds.Alchemist) =>
 const _rarityIncrease = (alchemist: ds.Alchemist) =>
   _alchemist(alchemist.name, alchemist.title).at('rarityIncrease')
 
-export type Configuration = {
+type ConfigurationProps = {
   recipe: ds.Recipe
   alchemist1: ds.Alchemist
   alchemist2: ds.Alchemist
   extraIngredient: ds.Material
 }
 
+export class Configuration implements ConfigurationProps {
+  recipe: ds.Recipe
+  alchemist1: ds.Alchemist
+  alchemist2: ds.Alchemist
+  extraIngredient: ds.Material
+
+  constructor({ recipe, alchemist1, alchemist2, extraIngredient }: ConfigurationProps) {
+    this.recipe = recipe
+    this.alchemist1 = alchemist1
+    this.alchemist2 = alchemist2
+    this.extraIngredient = extraIngredient
+  }
+
+  get alchemist1Effective(): boolean {
+    return this.recipe.colors.includes(this.alchemist1.color1)
+  }
+
+  get alchemist2Effective(): boolean {
+    return this.alchemist1.color2 === this.alchemist2.color1
+  }
+
+  get extraIngredientEffective(): boolean {
+    return this.alchemist2.color2 === this.extraIngredient.color
+  }
+
+  synthesize(settings: GlobalSettings): Synthesis {
+    const isConsumable = this.recipe.category.startsWith(ds.ItemType.CONSUMABLE)
+
+    const alchemistEffects = (alchemist: ds.Alchemist) =>
+      isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]
+    const ingredientEffects = (ingredient: ds.Material) =>
+      isConsumable === (ingredient.effectType === ds.ItemType.CONSUMABLE) ? ingredient.effects : []
+
+    const effects = {
+      alchemist1: alchemistEffects(this.alchemist1).map(name => ({ name, active: this.alchemist1Effective })),
+      alchemist2: alchemistEffects(this.alchemist2).map(name => ({ name, active: this.alchemist2Effective })),
+      extraIngredient: ingredientEffects(this.extraIngredient).map(name => ({ name, active: this.extraIngredientEffective })),
+    }
+
+    const rarityIncrease = {
+      alchemist1: Optic.get(_rarityIncrease(this.alchemist1))(settings),
+      alchemist2: Optic.get(_rarityIncrease(this.alchemist2))(settings),
+    }
+
+    return {
+      config: this,
+      effects,
+      rarityIncrease,
+    }
+  }
+}
+
+type EffectExpressions = { name: string; active: boolean }[]
+
 export type Synthesis = {
   config: Configuration
   effects: {
-    alchemist1: { name: string; active: boolean }[]
-    alchemist2: { name: string; active: boolean }[]
-    extraIngredient: { name: string; active: boolean }[]
+    alchemist1: EffectExpressions
+    alchemist2: EffectExpressions
+    extraIngredient: EffectExpressions
   }
   rarityIncrease: {
     alchemist1: number
     alchemist2: number
   }
 }
-
-const synthesize = (config: Configuration, settings: GlobalSettings): Synthesis => {
-  const isConsumable = config.recipe.category.startsWith(ds.ItemType.CONSUMABLE)
-
-  const alchemistEffects = (alchemist: ds.Alchemist) =>
-    isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]
-  const ingredientEffects = (ingredient: ds.Material) =>
-    isConsumable === (ingredient.effectType === ds.ItemType.CONSUMABLE) ? ingredient.effects : []
-
-  const effects = {
-    alchemist1: alchemistEffects(config.alchemist1).map(name => ({ name, active: true })),
-    alchemist2: alchemistEffects(config.alchemist2).map(name => ({ name, active: true })),
-    extraIngredient: ingredientEffects(config.extraIngredient).map(name => ({ name, active: true })),
-  }
-
-  const rarityIncrease = {
-    alchemist1: Optic.get(_rarityIncrease(config.alchemist1))(settings),
-    alchemist2: Optic.get(_rarityIncrease(config.alchemist2))(settings),
-  }
-
-  return {
-    config,
-    effects,
-    rarityIncrease,
-  }
-}
-
 
 type Cmp = -1 | 0 | 1
 
@@ -76,30 +103,31 @@ const possibleEffects = (synthesis: Synthesis) => [
   ...synthesis.effects.alchemist1,
   ...synthesis.effects.alchemist2,
   ...synthesis.effects.extraIngredient,
-]
+].filter(({ active }) => active)
 
 export const search = (
   recipe: ds.Recipe,
   desiredEffects: (string | null)[],
   settings: GlobalSettings,
+  allowIneffectiveAlchemists: boolean
 ): Synthesis[] => {
   const syntheses: Synthesis[] = []
 
   for (const alchemist1 of ds.alchemists) {
     if (Optic.get(_disabled(alchemist1))(settings)) continue;
-    if (!recipe.colors.includes(alchemist1.color1)) continue
+    if (!allowIneffectiveAlchemists && !recipe.colors.includes(alchemist1.color1)) continue
 
     for (const alchemist2 of ds.alchemists) {
       if (Optic.get(_disabled(alchemist2))(settings)) continue;
-      if (alchemist1.color2 !== alchemist2.color1) continue
+      if (!allowIneffectiveAlchemists && alchemist1.color2 !== alchemist2.color1) continue
       if (alchemist1.name === alchemist2.name) continue
 
       for (const extraIngredient of ds.materials) {
         if (alchemist2.color2 !== extraIngredient.color) continue
         if (!recipe.category.startsWith(extraIngredient.effectType)) continue
 
-        const config = { recipe, alchemist1, alchemist2, extraIngredient }
-        const synthesis = synthesize(config, settings)
+        const config = new Configuration({ recipe, alchemist1, alchemist2, extraIngredient })
+        const synthesis = config.synthesize(settings)
         const effects = possibleEffects(synthesis)
 
         if (desiredEffects.every(e => e === null || effects.some(({ name }) => name === e))) {
@@ -125,11 +153,7 @@ export const search = (
 export const effectsOfSyntheses = (syntheses: Synthesis[]): string[] => {
   const effects = new Set<string>()
   for (const s of syntheses) {
-    for (const { name: eff } of [
-      ...s.effects.alchemist1,
-      ...s.effects.alchemist2,
-      ...s.effects.extraIngredient
-    ]) {
+    for (const { name: eff } of possibleEffects(s)) {
       effects.add(eff)
     }
   }
