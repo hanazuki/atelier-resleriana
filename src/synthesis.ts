@@ -9,6 +9,50 @@ const _disabled = (alchemist: ds.Alchemist) =>
 const _rarityIncrease = (alchemist: ds.Alchemist) =>
   _alchemist(alchemist.name, alchemist.title).at('rarityIncrease')
 
+const compatibleEffects: Map<ds.ItemCategory, Set<string>> = (() => {
+  const compatibleEffects = new Map<ds.ItemCategory, Set<string>>()
+
+  for (const [, itemCategory] of Object.entries(ds.ItemCategory)) {
+    let categories: ds.EffectCategory[]
+
+    if (itemCategory.startsWith(ds.ItemType.EQUIPMENT)) {
+      categories = [ds.EffectCategory.ATTACK, ds.EffectCategory.BUFF, ds.EffectCategory.DEBUFF, ds.EffectCategory.HEAL]
+    } else {
+      switch (itemCategory) {
+        case ds.ItemCategory.ATTACK:
+          categories = [ds.EffectCategory.ATTACK, ds.EffectCategory.DEBUFF]
+          break
+        case ds.ItemCategory.BUFF:
+          categories = [ds.EffectCategory.BUFF]
+          break
+        case ds.ItemCategory.DEBUFF:
+          categories = [ds.EffectCategory.DEBUFF]
+          break
+        case ds.ItemCategory.HEAL:
+          categories = [ds.EffectCategory.BUFF, ds.EffectCategory.HEAL]
+          break
+        default:
+          throw null; // unreachable
+      }
+    }
+
+    for (const effect of ds.effects) {
+      if (!categories.includes(effect.category)) continue
+      if (!itemCategory.startsWith(effect.itemType)) continue
+      (compatibleEffects.get(itemCategory) || (() => {
+        const s = new Set<string>()
+        compatibleEffects.set(itemCategory, s)
+        return s
+      })()).add(effect.name)
+    }
+  }
+
+  return compatibleEffects
+})()
+
+const isCompatibleEffect = (itemCategory: ds.ItemCategory, effect: string): boolean =>
+  !!compatibleEffects.get(itemCategory)?.has(effect)
+
 type ConfigurationProps = {
   recipe: ds.Recipe
   alchemist1: ds.Alchemist
@@ -42,7 +86,8 @@ export class Configuration implements ConfigurationProps {
   }
 
   synthesize(settings: GlobalSettings): Synthesis {
-    const isConsumable = this.recipe.category.startsWith(ds.ItemType.CONSUMABLE)
+    const itemCategory = this.recipe.category
+    const isConsumable = itemCategory.startsWith(ds.ItemType.CONSUMABLE)
 
     const alchemistEffects = (alchemist: ds.Alchemist) =>
       isConsumable ? alchemist.effects.slice(0, 2) : [alchemist.effects[2]]
@@ -50,9 +95,12 @@ export class Configuration implements ConfigurationProps {
       isConsumable === (ingredient.effectType === ds.ItemType.CONSUMABLE) ? ingredient.effects : []
 
     const effects = {
-      alchemist1: alchemistEffects(this.alchemist1).map(name => ({ name, active: this.alchemist1Effective })),
-      alchemist2: alchemistEffects(this.alchemist2).map(name => ({ name, active: this.alchemist2Effective })),
-      extraIngredient: ingredientEffects(this.extraIngredient).map(name => ({ name, active: this.extraIngredientEffective })),
+      alchemist1: alchemistEffects(this.alchemist1).map(name =>
+        ({ name, active: this.alchemist1Effective && isCompatibleEffect(itemCategory, name) })),
+      alchemist2: alchemistEffects(this.alchemist2).map(name =>
+        ({ name, active: this.alchemist2Effective && isCompatibleEffect(itemCategory, name) })),
+      extraIngredient: ingredientEffects(this.extraIngredient).map(name =>
+        ({ name, active: this.extraIngredientEffective && isCompatibleEffect(itemCategory, name) })),
     }
 
     const rarityIncrease = {
@@ -99,11 +147,13 @@ const cmpEffects = (a: string, b: string): Cmp => {
   return cmp(split(a), split(b))
 }
 
-const possibleEffects = (synthesis: Synthesis) => [
-  ...synthesis.effects.alchemist1,
-  ...synthesis.effects.alchemist2,
-  ...synthesis.effects.extraIngredient,
-].filter(({ active }) => active)
+const possibleEffects = (synthesis: Synthesis) => {
+  return [
+    ...synthesis.effects.alchemist1,
+    ...synthesis.effects.alchemist2,
+    ...synthesis.effects.extraIngredient,
+  ].filter(({ active }) => active)
+}
 
 export const search = (
   recipe: ds.Recipe,

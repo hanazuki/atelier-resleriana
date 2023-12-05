@@ -130,9 +130,15 @@ const IngredientCard: React.FC<{
     <Card.Content>
       <Card.Header>{ingredient.name}</Card.Header>
       <Card.Description>
-        {effects.map(({ name }) =>
-          <div key={name}>{desiredEffects.includes(name) ? <strong>{name}</strong> : name}</div>
-        )}
+        {effects.map(({ name, active }) => {
+          const nameHtml = active
+            ? desiredEffects.includes(name)
+              ? <strong>{name}</strong>
+              : name
+            : <s>{name}</s>
+
+          return <div key={name}>{nameHtml}</div>
+        })}
       </Card.Description>
     </Card.Content>
     <Card.Content extra style={{ display: 'flex', alignItems: 'center' }}>
