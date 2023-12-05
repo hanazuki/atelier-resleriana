@@ -22,7 +22,7 @@ const EffectChooser: React.FC<EffectChooserProps> = ({ effects, possibleEffects,
   const filteredEffects = effects.filter(eff => eff.includes(filter))
 
   return <>
-    <Input icon='filter' placeholder='フィルタ' value={filter} onChange={(_e, data) => setFilter(data.value)} />
+    <Input icon='filter' placeholder='フィルタ' value={filter} onChange={(_e, data) => setFilter(data.value)} style={{ width: '100%' }} />
     <List>
       {filteredEffects.map(effect => {
         const selected = selectedEffects.includes(effect)
