@@ -37,7 +37,7 @@
     "@typescript-eslint/parser": "^6.0.0",
     "@vanilla-extract/vite-plugin": "^3.9.0",
     "@vitejs/plugin-react": "^4.0.3",
-    "eslint": "^8.45.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "grpc-tools": "^1.12.4",
